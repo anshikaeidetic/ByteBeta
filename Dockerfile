@@ -4,7 +4,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir ".[server,openai,anthropic]"
+RUN pip install --no-cache-dir ".[server,openai,anthropic,onnx]"
+
+# Pre-download embedding model so cold starts don't hit HuggingFace at runtime
+RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('GPTCache/albert-duplicate-onnx')"
 
 ENV BYTE_HOST=0.0.0.0
 
