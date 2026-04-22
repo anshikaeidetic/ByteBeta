@@ -185,48 +185,62 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                 use_routed_gateway=use_routed_gateway,
             )
             if is_stream:
+                import asyncio
 
-                def generate() -> Any:
-                    try:
-                        _content_buf: list[str] = []
-                        _is_cache_hit = False
+                async def generate() -> Any:
+                    queue: asyncio.Queue = asyncio.Queue()
+                    _sentinel = object()
 
-                        def _maybe_empty_hit_frame() -> str | None:
-                            # Stale cache entry returned no content — invalidate so next request hits the LLM.
-                            if _is_cache_hit and not "".join(_content_buf).strip():
-                                query = _last_user_content(chat_params)
-                                if query:
-                                    runtime.gateway_cache.invalidate_by_query(query)
-                                return f"data: {_EMPTY_HIT_PAYLOAD}\n\n"
-                            return None
+                    def _produce() -> None:
+                        try:
+                            _content_buf: list[str] = []
+                            _is_cache_hit = False
 
-                        for stream_response in handler(
-                            cache_obj=runtime.gateway_cache,
-                            cache_skip=cache_skip,
-                            **auth_kwargs,
-                            **chat_params,
-                        ):
-                            if stream_response == "[DONE]":
-                                frame = _maybe_empty_hit_frame()
-                                if frame:
-                                    yield frame
-                                yield "data: [DONE]\n\n"
-                                return
-                            if isinstance(stream_response, dict):
-                                if stream_response.get("byte") is True:
-                                    _is_cache_hit = True
-                                _choices = stream_response.get("choices") or []
-                                if _choices:
-                                    _delta_content = (_choices[0].get("delta") or {}).get("content") or ""
-                                    _content_buf.append(_delta_content)
-                            yield f"data: {json.dumps(stream_response)}\n\n"
-                        frame = _maybe_empty_hit_frame()
-                        if frame:
-                            yield frame
-                        yield "data: [DONE]\n\n"
-                    except Exception as stream_exc:
-                        yield f"data: {json.dumps({'error': {'message': str(stream_exc), 'type': 'stream_error'}})}\n\n"
-                        yield "data: [DONE]\n\n"
+                            def _maybe_empty_hit_frame() -> str | None:
+                                if _is_cache_hit and not "".join(_content_buf).strip():
+                                    query = _last_user_content(chat_params)
+                                    if query:
+                                        runtime.gateway_cache.invalidate_by_query(query)
+                                    return f"data: {_EMPTY_HIT_PAYLOAD}\n\n"
+                                return None
+
+                            for stream_response in handler(
+                                cache_obj=runtime.gateway_cache,
+                                cache_skip=cache_skip,
+                                **auth_kwargs,
+                                **chat_params,
+                            ):
+                                if stream_response == "[DONE]":
+                                    frame = _maybe_empty_hit_frame()
+                                    if frame:
+                                        queue.put_nowait(frame)
+                                    queue.put_nowait("data: [DONE]\n\n")
+                                    return
+                                if isinstance(stream_response, dict):
+                                    if stream_response.get("byte") is True:
+                                        _is_cache_hit = True
+                                    _choices = stream_response.get("choices") or []
+                                    if _choices:
+                                        _delta_content = (_choices[0].get("delta") or {}).get("content") or ""
+                                        _content_buf.append(_delta_content)
+                                queue.put_nowait(f"data: {json.dumps(stream_response)}\n\n")
+                            frame = _maybe_empty_hit_frame()
+                            if frame:
+                                queue.put_nowait(frame)
+                            queue.put_nowait("data: [DONE]\n\n")
+                        except Exception as stream_exc:
+                            queue.put_nowait(f"data: {json.dumps({'error': {'message': str(stream_exc), 'type': 'stream_error'}})}\n\n")
+                            queue.put_nowait("data: [DONE]\n\n")
+                        finally:
+                            queue.put_nowait(_sentinel)
+
+                    asyncio.get_event_loop().run_in_executor(None, _produce)
+
+                    while True:
+                        item = await queue.get()
+                        if item is _sentinel:
+                            break
+                        yield item
 
                 _audit_event(
                     services,

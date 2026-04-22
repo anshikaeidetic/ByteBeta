@@ -1155,6 +1155,10 @@
       <span class="sstat-label">Byte Tokens</span>
       <span class="sstat-val" id="sByteTokens">0</span>
     </div>
+    <div class="sstat">
+      <span class="sstat-label">Direct Tokens</span>
+      <span class="sstat-val" id="sDirectTokens">0</span>
+    </div>
     <div class="sstat-sep"></div>
     <div class="sstat" id="lastByteStatBox" style="display:none;">
       <span class="sstat-label">Last Byte</span>
@@ -2704,7 +2708,7 @@ function _scheduleModelFetch() {
     const sel = $('provider');
     if (sel.value !== detected) {
       sel.value = detected;
-      changeProvider();
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
     }
   }
   clearTimeout(_modelFetchTimer);
@@ -3740,6 +3744,8 @@ function updateStats() {
   $('sTokens').textContent = (b.tok + d.tok).toLocaleString();
   const sByteTokensEl = document.getElementById('sByteTokens');
   if (sByteTokensEl) sByteTokensEl.textContent = b.tok.toLocaleString();
+  const sDirectTokensEl = document.getElementById('sDirectTokens');
+  if (sDirectTokensEl) sDirectTokensEl.textContent = d.tok.toLocaleString();
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
