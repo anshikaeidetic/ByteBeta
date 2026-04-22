@@ -1071,8 +1071,8 @@
       <div class="cfg">
         <div class="cfg-label">API Key</div>
         <div style="display:flex;gap:4px;align-items:center;">
-          <input class="cfg-input lg" id="apiKey" type="text" style="-webkit-text-security:disc" placeholder="sk-…  or  anthropic / groq key" autocomplete="off" />
-          <button class="btn btn-xs" id="toggleKeyVis" onclick="toggleKeyVisibility()" title="Show/hide key" style="min-width:28px;padding:2px 5px;font-size:13px;">&#128065;</button>
+          <input class="cfg-input lg" id="apiKey" type="text" placeholder="sk-…  or  anthropic / groq key" autocomplete="off" spellcheck="false" />
+          <button class="btn btn-xs" id="toggleKeyVis" onclick="toggleKeyVisibility()" title="Show/hide key" style="min-width:32px;padding:2px 6px;font-size:12px;">Hide</button>
         </div>
       </div>
       <div class="cfg">
@@ -3010,9 +3010,9 @@ function toggleOpt(key, chipId, onLabel, offLabel) {
 
 function toggleKeyVisibility() {
   const inp = $('apiKey');
-  const hidden = inp.style.webkitTextSecurity === 'disc';
-  inp.style.webkitTextSecurity = hidden ? 'none' : 'disc';
-  $('toggleKeyVis').innerHTML = hidden ? '&#128274;' : '&#128065;';
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  $('toggleKeyVis').textContent = show ? 'Hide' : 'Show';
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -3390,6 +3390,8 @@ async function sendByte(text, messages) {
   if (result.emptyCacheHit) {
     toast('Stale cache entry — retrying with fresh request…', 'info', 2500);
     activateFeature('fi-cascade');
+    const _dLast = S.directHistory[S.directHistory.length - 1];
+    if (_dLast && _dLast.role === 'assistant') S.directHistory.pop();
     result = await _sendByteOnce(text, messages, /* forceSkip */ true);
   }
   if (!result.success) {
