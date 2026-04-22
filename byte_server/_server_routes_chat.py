@@ -54,14 +54,6 @@ _PROVIDER_PREFIXES: dict[str, tuple[str, ...]] = {
     "mistral":   ("mistral-", "codestral-"),
     "cohere":    ("command-", "c4ai-"),
 }
-_EMPTY_HIT_PAYLOAD = json.dumps({
-    "error": {
-        "message": "Byte cache returned empty response — stale entry auto-invalidated.",
-        "type": "empty_cache_hit",
-    }
-})
-
-
 def _last_user_content(params: dict) -> str:
     for msg in reversed(params.get("messages") or []):
         if isinstance(msg, dict) and msg.get("role") == "user":
@@ -191,24 +183,14 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                     yield ": ok\n\n"
                     queue: asyncio.Queue = asyncio.Queue()
                     _sentinel = object()
-                    _loop = asyncio.get_event_loop()
+                    _loop = asyncio.get_running_loop()
 
                     def _enqueue(item: object) -> None:
                         _loop.call_soon_threadsafe(queue.put_nowait, item)
 
                     def _produce() -> None:
                         try:
-                            _content_buf: list[str] = []
                             _is_cache_hit = False
-
-                            def _maybe_empty_hit_frame() -> str | None:
-                                if _is_cache_hit and not "".join(_content_buf).strip():
-                                    query = _last_user_content(chat_params)
-                                    if query:
-                                        runtime.gateway_cache.invalidate_by_query(query)
-                                    return f"data: {_EMPTY_HIT_PAYLOAD}\n\n"
-                                return None
-
                             for stream_response in handler(
                                 cache_obj=runtime.gateway_cache,
                                 cache_skip=cache_skip,
@@ -216,22 +198,13 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                                 **chat_params,
                             ):
                                 if stream_response == "[DONE]":
-                                    frame = _maybe_empty_hit_frame()
-                                    if frame:
-                                        _enqueue(frame)
                                     _enqueue("data: [DONE]\n\n")
                                     return
-                                if isinstance(stream_response, dict):
-                                    if stream_response.get("byte") is True:
-                                        _is_cache_hit = True
-                                    _choices = stream_response.get("choices") or []
-                                    if _choices:
-                                        _delta_content = (_choices[0].get("delta") or {}).get("content") or ""
-                                        _content_buf.append(_delta_content)
+                                if isinstance(stream_response, dict) and stream_response.get("byte") is True:
+                                    _is_cache_hit = True
                                 _enqueue(f"data: {json.dumps(stream_response)}\n\n")
-                            frame = _maybe_empty_hit_frame()
-                            if frame:
-                                _enqueue(frame)
+                                if _is_cache_hit:
+                                    time.sleep(0.005)
                             _enqueue("data: [DONE]\n\n")
                         except Exception as stream_exc:
                             _enqueue(f"data: {json.dumps({'error': {'message': str(stream_exc), 'type': 'stream_error'}})}\n\n")
@@ -246,6 +219,7 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                         if item is _sentinel:
                             break
                         yield item
+                        await asyncio.sleep(0)
 
                 _audit_event(
                     services,

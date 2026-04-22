@@ -174,10 +174,23 @@ def _rank_cache_answers_sync(
 
         # Stage 1: Exact lane — above threshold, return from cache directly
         if rank_threshold <= rank:
+            answer_text = cache_data.answers[0].answer if cache_data.answers else None
+            if not answer_text or not str(answer_text).strip():
+                byte_log.debug("skip empty cache entry (sync, rank=%.3f)", rank)
+                try:
+                    q = cache_data.question
+                    q_text = q.content if hasattr(q, "content") else q
+                    if q_text:
+                        state.chat_cache.data_manager.invalidate_by_query(
+                            q_text, embedding_func=state.chat_cache.embedding_func
+                        )
+                except Exception:
+                    pass
+                continue
             cache_answers.append(
                 CacheAnswerMatch(
                     rank=float(rank),
-                    answer=cache_data.answers[0].answer,
+                    answer=answer_text,
                     search_data=search_data,
                     cache_data=cache_data,
                 )
@@ -251,10 +264,14 @@ async def _rank_cache_answers_async(
 
         # Stage 1: Exact lane — above threshold, return from cache directly
         if rank_threshold <= rank:
+            answer_text = cache_data.answers[0].answer if cache_data.answers else None
+            if not answer_text or not str(answer_text).strip():
+                byte_log.debug("skip empty cache entry (async, rank=%.3f)", rank)
+                continue
             cache_answers.append(
                 CacheAnswerMatch(
                     rank=float(rank),
-                    answer=cache_data.answers[0].answer,
+                    answer=answer_text,
                     search_data=search_data,
                     cache_data=cache_data,
                 )

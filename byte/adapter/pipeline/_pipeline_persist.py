@@ -13,6 +13,7 @@ from byte.utils.time import time_cal
 from ._pipeline_state import PipelineRunState
 from .utils import (
     _admission_allowed,
+    _answer_has_content,
     _await_with_report,
     _cache_save_allowed,
     _log_background_task_result,
@@ -37,6 +38,9 @@ def persist_response_sync(state: PipelineRunState) -> None:
                 state.response_assessment,
                 task_policy=state.task_policy,
             ):
+                return
+            if not _answer_has_content(handled_llm_data):
+                byte_log.debug("skip cache save: empty answer content (sync)")
                 return
             if _should_skip_dedup_sync(state):
                 return
@@ -93,6 +97,9 @@ async def persist_response_async(state: PipelineRunState) -> None:
                 state.response_assessment,
                 task_policy=state.task_policy,
             ):
+                return
+            if not _answer_has_content(handled_llm_data):
+                byte_log.debug("skip cache save: empty answer content (async)")
                 return
 
             async def save_to_cache() -> None:

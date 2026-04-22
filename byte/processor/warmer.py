@@ -161,6 +161,9 @@ class CacheWarmer:
                 effective_request,
                 cache_obj,
             )
+        if not answer or not str(answer).strip():
+            byte_log.debug("warmer: skip empty answer for question=%r", question)
+            return 0
         embedding = cache_obj.embedding_func(pre_embedding_data)
         cache_obj.data_manager.save(
             pre_store_data,

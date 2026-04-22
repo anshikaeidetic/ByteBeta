@@ -1071,7 +1071,7 @@
       <div class="cfg">
         <div class="cfg-label">API Key</div>
         <div style="display:flex;gap:4px;align-items:center;">
-          <input class="cfg-input lg" id="apiKey" type="text" placeholder="sk-…  or  anthropic / groq key" autocomplete="off" spellcheck="false" />
+          <input class="cfg-input lg" id="apiKey" type="text" placeholder="sk-…  or  anthropic / groq key" autocomplete="off" spellcheck="false" oninput="_scheduleModelFetch()" />
           <button class="btn btn-xs" id="toggleKeyVis" onclick="toggleKeyVisibility()" title="Show/hide key" style="min-width:32px;padding:2px 6px;font-size:12px;">Hide</button>
         </div>
       </div>
@@ -2702,22 +2702,31 @@ function _detectProviderFromKey(key) {
 
 let _lastDetectedProvider = null;
 
-// Debounced trigger: fires 700 ms after the user stops typing the API key.
 function _scheduleModelFetch() {
   const key = $('apiKey').value.trim();
   const detected = _detectProviderFromKey(key);
-  if (detected && detected !== _lastDetectedProvider) {
-    _lastDetectedProvider = detected;
+  if (detected) {
     const sel = $('provider');
-    sel.value = detected;
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
-    if (key.length > 10) fetchModels(true);
-    toast(`Detected ${detected} provider from API key`, 'ok', 2000);
+    if (sel.value !== detected) {
+      sel.value = detected;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    _lastDetectedProvider = detected;
+  } else if (!key) {
+    _lastDetectedProvider = null;
   }
-  if (!key) _lastDetectedProvider = null;
   clearTimeout(_modelFetchTimer);
   _modelFetchTimer = setTimeout(() => {
-    if (key.length > 10) fetchModels(true);
+    const k = $('apiKey').value.trim();
+    if (k.length > 10) {
+      const d = _detectProviderFromKey(k);
+      if (d) {
+        const sel = $('provider');
+        if (sel.value !== d) { sel.value = d; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+        toast(`${d} API key detected`, 'ok', 2000);
+        fetchModels(true);
+      }
+    }
   }, 700);
 }
 
@@ -3382,18 +3391,15 @@ async function sendBoth() {
   inp.focus();
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Byte request — auto-retries once on stale empty cache hits
-═══════════════════════════════════════════════════════════════════════════ */
+function _hasAttachment(messages) {
+  const last = [...messages].reverse().find(m => m.role === 'user');
+  if (!last) return false;
+  return Array.isArray(last.content) ||
+    (typeof last.content === 'string' && last.content.includes('[File:'));
+}
+
 async function sendByte(text, messages) {
-  let result = await _sendByteOnce(text, messages, S.cacheSkip);
-  if (result.emptyCacheHit) {
-    toast('Stale cache entry — retrying with fresh request…', 'info', 2500);
-    activateFeature('fi-cascade');
-    const _dLast = S.directHistory[S.directHistory.length - 1];
-    if (_dLast && _dLast.role === 'assistant') S.directHistory.pop();
-    result = await _sendByteOnce(text, messages, /* forceSkip */ true);
-  }
+  const result = await _sendByteOnce(text, messages, S.cacheSkip || _hasAttachment(messages));
   if (!result.success) {
     const _bLast = S.byteHistory[S.byteHistory.length - 1];
     if (_bLast && _bLast.role === 'user') S.byteHistory.pop();
@@ -3471,12 +3477,6 @@ async function _sendByteOnce(text, messages, skipCache) {
           try {
             const chunk = JSON.parse(raw);
             if (chunk.error) {
-              // Server signalled an empty cache hit — clean up and signal caller
-              if (chunk.error.type === 'empty_cache_hit') {
-                const el = $(shellId); if (el) el.remove();
-                removeTyping('byteMsgs');
-                return { success:false, emptyCacheHit:true };
-              }
               throw new Error(chunk.error.message || JSON.stringify(chunk.error));
             }
             content += chunk.choices?.[0]?.delta?.content || '';
@@ -3496,7 +3496,7 @@ async function _sendByteOnce(text, messages, skipCache) {
       }
       if (!content && streamCompleted) {
         const el = $(shellId); if (el) el.remove();
-        return { success:false, emptyCacheHit:true };
+        throw new Error(`Byte returned empty response for "${byteModel}".`);
       }
 
       const lat = performance.now() - t0;
@@ -3518,14 +3518,13 @@ async function _sendByteOnce(text, messages, skipCache) {
       if (hit)      { activateFeature('fi-cache'); activateFeature('fi-reasoning'); }
       if (st.worker)  activateFeature('fi-routing');
       if (S.distill)  activateFeature('fi-distill');
-      return { success:true, emptyCacheHit:false };
+      return { success:true };
 
     } else {
       const data = await resp.json();
       const lat  = performance.now() - t0;
       content    = data.choices?.[0]?.message?.content || '';
       hit        = !!data.byte;
-      if (!content && hit) return { success:false, emptyCacheHit:true };
       if (!content) {
         throw new Error(`No response from Byte for "${byteModel}". Ensure server has the ${$('provider').value} API key.`);
       }
@@ -3547,14 +3546,14 @@ async function _sendByteOnce(text, messages, skipCache) {
       if (hit)      { activateFeature('fi-cache'); activateFeature('fi-reasoning'); }
       if (st.worker)  activateFeature('fi-routing');
       if (S.distill)  activateFeature('fi-distill');
-      return { success:true, emptyCacheHit:false };
+      return { success:true };
     }
 
   } catch(e) {
     removeTyping('byteMsgs');
     if (_byteShellId) { const el = $(_byteShellId); if (el) el.remove(); }
     addErrMsg('byteMsgs', `Byte Error: ${e.message}`);
-    return { success:false, emptyCacheHit:false, error: e.message };
+    return { success:false, error: e.message };
   }
 }
 
@@ -3752,7 +3751,7 @@ function updateStats() {
   $('sByteCost').textContent   = fmtCost(btc);
   $('sDirectCost').textContent = fmtCost(dtc);
   $('sCostSaved').textContent  = fmtCost(Math.abs(saved));
-  if (saved > 0) $('sSavedBadge').classList.remove('hidden');
+  $('sSavedBadge').classList.toggle('hidden', saved <= 0);
 
   // Tokens
   $('sTokens').textContent = (b.tok + d.tok).toLocaleString();

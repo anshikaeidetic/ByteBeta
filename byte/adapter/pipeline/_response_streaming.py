@@ -14,6 +14,7 @@ from byte.utils.time import time_cal
 from ._response_commit import _complete_coalescer, _record_route_completion
 from ._runtime_support import (
     _admission_allowed,
+    _answer_has_content,
     _await_with_report,
     _cache_save_allowed,
     _log_background_task_result,
@@ -58,6 +59,9 @@ def finalize_sync_llm_response(
                 if not _cache_save_allowed(context):
                     return
                 if not _admission_allowed(chat_cache, response_assessment, task_policy=task_policy):
+                    return
+                if not _answer_has_content(handled_llm_data):
+                    byte_log.debug("skip cache save: empty answer content (stream sync)")
                     return
 
                 dedup_thresh = chat_cache.config.dedup_threshold
@@ -196,6 +200,9 @@ async def finalize_async_llm_response(
                 if not _cache_save_allowed(context):
                     return
                 if not _admission_allowed(chat_cache, response_assessment, task_policy=task_policy):
+                    return
+                if not _answer_has_content(handled_llm_data):
+                    byte_log.debug("skip cache save: empty answer content (stream async)")
                     return
 
                 async def save_to_cache() -> None:

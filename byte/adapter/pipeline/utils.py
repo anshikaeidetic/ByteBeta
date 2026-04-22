@@ -338,6 +338,18 @@ def _admission_allowed(chat_cache, assessment, task_policy=None) -> bool:
     return assessment.score >= min_score
 
 
+def _answer_has_content(handled_llm_data) -> bool:
+    if handled_llm_data is None:
+        return False
+    text = getattr(handled_llm_data, "answer", handled_llm_data)
+    if text is None:
+        return False
+    try:
+        return bool(str(text).strip())
+    except Exception:
+        return False
+
+
 def _requires_verified_reuse(chat_cache, request_kwargs) -> bool:
     intent = extract_request_intent(request_kwargs)
     if getattr(chat_cache.config, "verified_reuse_for_all", False):
