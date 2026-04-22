@@ -5,6 +5,7 @@ from byte._backends._openai_media import Audio, Image, Moderation, Speech
 from byte._backends._openai_support import (
     async_iter,
 )
+from byte._backends._openai_transport import _get_async_client, _get_client
 from byte.adapter.adapter import aadapt, adapt
 from byte.adapter.base import BaseCacheLLM
 from byte.adapter.prompt_cache_bridge import (
@@ -28,6 +29,8 @@ __all__ = [
     "BaseCacheLLM",
     "ChatCompletion",
     "Completion",
+    "_get_async_client",
+    "_get_client",
     "DataType",
     "Image",
     "Moderation",
