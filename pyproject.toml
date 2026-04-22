@@ -92,7 +92,7 @@ server = [
     "python-multipart>=0.0.22,<1",
     "opentelemetry-api>=1.37,<1.38",
     "opentelemetry-sdk>=1.37,<1.38",
-    "opentelemetry-exporter-otlp-proto-http>=1.37,<1.38",
+    "opentelemetry-exporter-otlp-proto-http>=1.37,<1.42",
     "opentelemetry-exporter-otlp-proto-grpc>=1.37,<1.38",
 ]
 faiss = ["faiss-cpu>=1.11,<2"]
@@ -128,7 +128,7 @@ all = [
     "uvicorn>=0.42,<1",
     "pydantic>=2.12,<3",
     "python-multipart>=0.0.22,<1",
-    "opentelemetry-exporter-otlp-proto-http>=1.37,<1.38",
+    "opentelemetry-exporter-otlp-proto-http>=1.37,<1.42",
     "opentelemetry-exporter-otlp-proto-grpc>=1.37,<1.38",
     "faiss-cpu>=1.11,<2",
     "onnxruntime>=1.20,<2; python_version>='3.11'",
