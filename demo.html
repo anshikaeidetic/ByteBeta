@@ -2215,6 +2215,12 @@ const PRICING = {
   'mistral-small':            { in: 1.00,  out:  3.00 },
   'mistral-nemo':             { in: 0.30,  out:  0.30 },
   'llama-3.1-405b':           { in: 5.32,  out: 16.00 },
+  'llama-3.1-8b-instant':     { in: 0.05,  out:  0.08 },
+  'llama-3.3-70b-versatile':  { in: 0.59,  out:  0.79 },
+  'gemma':                    { in: 0.07,  out:  0.07 },
+  'command-r-plus':           { in: 2.50,  out: 10.00 },
+  'command-r':                { in: 0.15,  out:  0.60 },
+  'codestral':                { in: 1.00,  out:  3.00 },
 };
 
 function calcCost(model, pin, pout) {
@@ -2695,8 +2701,9 @@ function _detectProviderFromKey(key) {
   if (key.startsWith('sk-or-'))  return 'openrouter';
   if (key.startsWith('AIza'))    return 'google';
   if (key.startsWith('ya29.'))   return 'vertex';
-  if (key.startsWith('hf_'))    return 'huggingface';
-  if (key.startsWith('sk-'))    return 'openai';
+  if (key.startsWith('hf_'))     return 'huggingface';
+  if (key.startsWith('AKIA'))    return 'bedrock';
+  if (key.startsWith('sk-'))     return 'openai';
   return null;
 }
 
@@ -3457,6 +3464,7 @@ async function _sendByteOnce(text, messages, skipCache) {
     stream: S.streaming,
     cache_skip: skipCache,
     ...(S.distill && { byte_prompt_distillation_mode: true }),
+    ...(S.streaming && { stream_options: { include_usage: true } }),
   };
 
   addTyping('byteMsgs');
@@ -3613,6 +3621,7 @@ async function sendDirect(text, messages) {
     messages: prependSystem(messages),
     stream: S.streaming,
     cache_skip: true,
+    ...(S.streaming && { stream_options: { include_usage: true } }),
   };
 
   addTyping('directMsgs');
@@ -3658,10 +3667,9 @@ async function sendDirect(text, messages) {
       }
 
       const lat  = performance.now() - t0;
-      // Anthropic usage fields differ
       const uso  = fin?.usage || {};
-      const pin  = uso.prompt_tokens ?? uso.input_tokens ?? 0;
-      const pout = uso.completion_tokens ?? uso.output_tokens ?? 0;
+      const pin  = uso.prompt_tokens ?? uso.input_tokens ?? Math.round(JSON.stringify(messages).length / 4);
+      const pout = uso.completion_tokens ?? uso.output_tokens ?? Math.round(content.length / 4);
       const cost = calcCost(model, pin, pout);
       const st   = { lat, cost, pin, pout, model:fin?.model||model };
 
@@ -3678,8 +3686,8 @@ async function sendDirect(text, messages) {
         ? (data.content?.[0]?.text || '')
         : (data.choices?.[0]?.message?.content || '');
       const uso  = data.usage || {};
-      const pin  = uso.prompt_tokens ?? uso.input_tokens ?? 0;
-      const pout = uso.completion_tokens ?? uso.output_tokens ?? 0;
+      const pin  = uso.prompt_tokens ?? uso.input_tokens ?? Math.round(JSON.stringify(messages).length / 4);
+      const pout = uso.completion_tokens ?? uso.output_tokens ?? Math.round(content.length / 4);
       const cost = calcCost(model, pin, pout);
       const st   = { lat, cost, pin, pout, model:data.model||model };
 

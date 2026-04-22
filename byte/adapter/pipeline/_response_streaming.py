@@ -48,7 +48,7 @@ def finalize_sync_llm_response(
 ) -> Any:
     """Persist and materialize a finalized sync response."""
     task_policy = context.get("_byte_task_policy") or {}
-    if cache_enable:
+    if cache_enable and not request_kwargs.get("cache_skip", False):
         try:
 
             def update_cache_func(handled_llm_data: Any, question: Any = None) -> None:
@@ -189,7 +189,7 @@ async def finalize_async_llm_response(
     """Persist and materialize a finalized async response."""
     task_policy = context.get("_byte_task_policy") or {}
     pending_cache_tasks: list[asyncio.Task[Any]] = []
-    if cache_enable:
+    if cache_enable and not request_kwargs.get("cache_skip", False):
         try:
 
             def update_cache_func(handled_llm_data: Any, question: Any = None) -> None:

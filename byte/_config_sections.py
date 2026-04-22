@@ -32,7 +32,7 @@ class CacheConfig:
     skip_list: list[str] | None = None
     data_check: bool = False
     ttl: int | float | None = None
-    model_namespace: bool = False
+    model_namespace: bool = True
     embedding_cache_size: int = 10000
     adaptive_threshold: bool = False
     target_hit_rate: float = 0.5

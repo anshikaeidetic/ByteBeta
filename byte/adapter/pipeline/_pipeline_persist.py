@@ -23,7 +23,7 @@ from .utils import (
 def persist_response_sync(state: PipelineRunState) -> None:
     """Save a sync provider response into cache when policy allows it."""
 
-    if not state.cache_enable:
+    if not state.cache_enable or state.cache_skip:
         return
     try:
 
@@ -82,7 +82,7 @@ def persist_response_sync(state: PipelineRunState) -> None:
 async def persist_response_async(state: PipelineRunState) -> None:
     """Save an async provider response into cache when policy allows it."""
 
-    if not state.cache_enable:
+    if not state.cache_enable or state.cache_skip:
         return
     try:
 
