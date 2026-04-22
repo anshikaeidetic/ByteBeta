@@ -61,8 +61,7 @@ def register_cache_routes(app: FastAPI, services: ServerServices) -> None:
             media_type="text/plain",
         )
 
-    @app.get("/healthz")
-    async def healthz() -> dict:
+    async def _health_payload() -> dict:
         ready, readiness = _readiness_payload(services)
         return {
             "status": "ok",
@@ -71,6 +70,16 @@ def register_cache_routes(app: FastAPI, services: ServerServices) -> None:
             "ready": ready,
             "readiness": readiness,
         }
+
+    @app.get("/healthz")
+    async def healthz() -> dict:
+        return await _health_payload()
+
+    # Google Frontend intercepts /healthz on some hosting platforms (e.g. Cloud Run)
+    # before it reaches the container, so /ping is exposed as a non-reserved alias.
+    @app.get("/ping")
+    async def ping() -> dict:
+        return await _health_payload()
 
     @app.get("/readyz")
     async def readyz() -> Response:

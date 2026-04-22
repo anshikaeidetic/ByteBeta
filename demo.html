@@ -2663,7 +2663,7 @@ function setStatus(state, label) {
 async function pingServer() {
   const url = $('byteUrl').value.trim().replace(/\/$/,'');
   try {
-    const r = await fetch(`${url}/healthz`);
+    const r = await fetch(`${url}/ping`);
     if (r.ok) {
       const h = await r.json();
       setStatus('on', `Connected · ${h.version || 'Byte'}`);
@@ -2881,7 +2881,7 @@ async function connect() {
   const byteUrl = $('byteUrl').value.trim().replace(/\/$/,'');
 
   try {
-    const r = await fetch(`${byteUrl}/healthz`);
+    const r = await fetch(`${byteUrl}/ping`);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const h = await r.json();
     S.connected = true;
@@ -4167,7 +4167,7 @@ async function loadHealth(tab) {
 
   try {
     if (tab === 'overview') {
-      const hR = await fetch(`${byteUrl}/healthz`).catch(() => null);
+      const hR = await fetch(`${byteUrl}/ping`).catch(() => null);
       let html = '';
       if (hR && hR.ok) {
         const h  = await hR.json();
