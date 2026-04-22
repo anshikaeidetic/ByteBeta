@@ -4463,11 +4463,11 @@ $('apiKey').addEventListener('keydown', e => { if (e.key === 'Enter') connect();
 window.addEventListener('load', () => {
   _setTheme(localStorage.getItem('byte-theme') || 'light');
 
-  // Use page hostname so the same demo.html works on localhost and remote VMs without reconfiguration.
-  // When served over http(s), use the current host. When opened via file://,
-  // window.location.hostname is empty — fall back to 127.0.0.1.
+  // Use page origin so demo.html works on localhost (port 8000), remote VMs, and cloud deployments
+  // without reconfiguration. On file:// fallback to 127.0.0.1:8000.
   const _host = window.location.hostname || '127.0.0.1';
-  $('byteUrl').value = `http://${_host || '127.0.0.1'}:8000`;
+  const _isLocal = _host === 'localhost' || _host === '127.0.0.1' || _host === '';
+  $('byteUrl').value = _isLocal ? `http://${_host}:8000` : window.location.origin;
 
   $('sendBtn').disabled = true;
   $('sharedInput').disabled = true;
