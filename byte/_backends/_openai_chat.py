@@ -118,11 +118,14 @@ class ChatCompletion(BaseCacheLLM):
                     chunk_text = get_stream_message_from_openai_answer(item) or ""
                     total_answer += chunk_text
                     yield item
-                update_cache_func(Answer(total_answer, DataType.STR))
+                if total_answer and total_answer.strip():
+                    update_cache_func(Answer(total_answer, DataType.STR))
 
             return hook_openai_data(llm_data)
         elif not isinstance(llm_data, Iterator):
-            update_cache_func(Answer(get_message_from_openai_answer(llm_data), DataType.STR))
+            text = get_message_from_openai_answer(llm_data) or ""
+            if text and text.strip():
+                update_cache_func(Answer(text, DataType.STR))
             return llm_data
         else:
 
@@ -132,7 +135,8 @@ class ChatCompletion(BaseCacheLLM):
                     chunk_text = get_stream_message_from_openai_answer(item) or ""
                     total_answer += chunk_text
                     yield item
-                update_cache_func(Answer(total_answer, DataType.STR))
+                if total_answer and total_answer.strip():
+                    update_cache_func(Answer(total_answer, DataType.STR))
 
             return hook_openai_data(llm_data)
 
@@ -250,7 +254,9 @@ class Completion(BaseCacheLLM):
 
     @staticmethod
     def _update_cache_callback(llm_data, update_cache_func, *args, **kwargs) -> Any:  # pylint: disable=unused-argument
-        update_cache_func(Answer(get_text_from_openai_answer(llm_data), DataType.STR))
+        text = get_text_from_openai_answer(llm_data) or ""
+        if text and text.strip():
+            update_cache_func(Answer(text, DataType.STR))
         return llm_data
 
     @classmethod

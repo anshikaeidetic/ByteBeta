@@ -2708,7 +2708,10 @@ function _scheduleModelFetch() {
     const sel = $('provider');
     sel.value = detected;
     sel.dispatchEvent(new Event('change', { bubbles: true }));
+    if (key.length > 10) fetchModels(true);
+    toast(`Detected ${detected} provider from API key`, 'ok', 2000);
   }
+  if (!key) _lastDetectedProvider = null;
   clearTimeout(_modelFetchTimer);
   _modelFetchTimer = setTimeout(() => {
     if (key.length > 10) fetchModels(true);
