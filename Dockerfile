@@ -6,11 +6,13 @@ COPY . .
 
 RUN pip install --no-cache-dir ".[server,openai,anthropic,onnx,sql]"
 
-# Pre-bake the ONNX embedding model into the image (network allowed during build only)
-RUN HF_HOME=/app/.hf_cache python -c \
-    "from huggingface_hub import snapshot_download; snapshot_download('GPTCache/albert-duplicate-onnx')"
+# Pre-bake the ONNX model and its tokenizer into the image
+RUN HF_HOME=/app/.hf_cache python -c "\
+from huggingface_hub import snapshot_download; \
+snapshot_download('GPTCache/albert-duplicate-onnx'); \
+snapshot_download('sentence-transformers/paraphrase-albert-small-v2')"
 
-# At runtime: use the baked model, block any HuggingFace network calls
+# At runtime: use baked models, block all HuggingFace network calls
 ENV HF_HOME=/app/.hf_cache
 ENV TRANSFORMERS_OFFLINE=1
 ENV HF_DATASETS_OFFLINE=1
