@@ -96,6 +96,11 @@ def _build_byte_features(
         "cache": {
             "hit": cache_hit,
             "similarity": resp.get("byte_similarity"),
+            "debug": {
+                "model_used": resp.get("model"),
+                "distill_mode": distill.get("mode") if distill else None,
+                "admitted": bool(resp.get("byte_admitted", True)),
+            },
         },
         "routing": {
             "enabled": True,

@@ -167,7 +167,7 @@ class ContextCompilerConfig:
 @dataclass
 class PromptDistillationConfig:
     prompt_distillation: bool = True
-    prompt_distillation_mode: str = "enabled"
+    prompt_distillation_mode: str = "shadow"
     prompt_distillation_backend: str = "hybrid_local"
     prompt_distillation_budget_ratio: float = 0.55
     prompt_distillation_min_chars: int = 512

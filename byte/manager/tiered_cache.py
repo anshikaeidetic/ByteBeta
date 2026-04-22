@@ -110,7 +110,10 @@ class TieredCacheManager:
             if entry is not None:
                 self._tier1.move_to_end(key)
                 self._tier1_hits += 1
-                return [(1.0, _Tier1Ref(key))]
+                # Use 0.0 = perfect-match distance so SearchDistanceEvaluation
+                # returns max_distance (best rank). Keys are per-embedding-hash,
+                # so a tier-1 hit IS an exact embedding match.
+                return [(0.0, _Tier1Ref(key))]
 
         results = self._backend.search(embedding_data, **kwargs)
         if results and results[0]:
@@ -119,7 +122,7 @@ class TieredCacheManager:
             if self._should_promote(key):
                 promoted = self._promote_from_backend(key, results[0])
                 if promoted:
-                    return [(1.0, _Tier1Ref(key))]
+                    return [(0.0, _Tier1Ref(key))]
             return results
 
         self._misses += 1
@@ -210,6 +213,34 @@ class TieredCacheManager:
     async def aadd_session(self, search_data, *args, **kwargs) -> Any:
         return await asyncio.to_thread(self.add_session, search_data, *args, **kwargs)
 
+    def _normalize_report_id(self, cache_question_id: Any) -> Any:
+        # Tier-0 references aren't persistent-storage IDs; normalize to a sentinel
+        # so the SQL report doesn't fail binding on the opaque object.
+        if isinstance(cache_question_id, _Tier1Ref):
+            return 0
+        return cache_question_id
+
+    def report_cache(
+        self,
+        user_question,
+        cache_question,
+        cache_question_id,
+        cache_answer,
+        similarity_value,
+        cache_delta_time,
+    ) -> Any | None:
+        normalized_id = self._normalize_report_id(cache_question_id)
+        if hasattr(self._backend, "report_cache"):
+            return self._backend.report_cache(
+                user_question,
+                cache_question,
+                normalized_id,
+                cache_answer,
+                similarity_value,
+                cache_delta_time,
+            )
+        return None
+
     async def areport_cache(
         self,
         user_question,
@@ -219,11 +250,12 @@ class TieredCacheManager:
         similarity_value,
         cache_delta_time,
     ) -> Any | None:
+        normalized_id = self._normalize_report_id(cache_question_id)
         if hasattr(self._backend, "areport_cache"):
             return await self._backend.areport_cache(
                 user_question,
                 cache_question,
-                cache_question_id,
+                normalized_id,
                 cache_answer,
                 similarity_value,
                 cache_delta_time,
@@ -233,7 +265,7 @@ class TieredCacheManager:
                 self._backend.report_cache,
                 user_question,
                 cache_question,
-                cache_question_id,
+                normalized_id,
                 cache_answer,
                 similarity_value,
                 cache_delta_time,

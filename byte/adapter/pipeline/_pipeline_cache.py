@@ -65,7 +65,6 @@ def _vcache_update(state: PipelineRunState, search_data: Any, similarity: float,
 
 def lookup_cache_sync(state: PipelineRunState) -> Any:
     """Attempt a sync semantic-cache lookup and return a converted response on hit."""
-
     if not (state.cache_enable and not state.cache_skip):
         return NO_RESULT
     # Pass the raw query text so the LSH prefilter  can probe
