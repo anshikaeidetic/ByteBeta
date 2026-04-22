@@ -327,7 +327,7 @@ def _should_bypass_current_cache_stage(chat_cache, request_kwargs, context) -> b
 
 def _admission_allowed(chat_cache, assessment, task_policy=None) -> bool:
     if assessment is None:
-        return True
+        return False
     if assessment.constraint != "freeform" and not assessment.accepted:
         return False
     min_score = float(

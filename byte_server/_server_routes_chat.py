@@ -188,6 +188,7 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                 import asyncio
 
                 async def generate() -> Any:
+                    yield ": ok\n\n"
                     queue: asyncio.Queue = asyncio.Queue()
                     _sentinel = object()
                     _loop = asyncio.get_event_loop()
@@ -270,6 +271,7 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                     headers={
                         "X-Accel-Buffering": "no",
                         "Cache-Control": "no-cache, no-transform",
+                        "Connection": "keep-alive",
                     },
                 )
 

@@ -4547,6 +4547,7 @@ window.addEventListener('load', () => {
 
   $('provider').addEventListener('change', changeProvider);
   $('apiKey').addEventListener('input', _scheduleModelFetch);
+  $('apiKey').addEventListener('paste', () => setTimeout(_scheduleModelFetch, 0));
 
   $('modelSel').addEventListener('change', () => {
     const model = $('modelSel').value;
