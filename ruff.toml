@@ -1,0 +1,23 @@
+line-length = 100
+target-version = "py310"
+force-exclude = true
+extend-exclude = [
+    "docs/reports",
+    "build",
+    "dist",
+    ".tox",
+    ".venv",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".hypothesis",
+    "byte.egg-info",
+    "tests/integration_tests",
+]
+
+[lint]
+select = ["B", "C4", "E", "F", "I", "PIE", "RUF", "SIM", "UP"]
+ignore = ["E501", "E402"]
+
+[lint.per-file-ignores]
+"byte/adapter/adapter.py" = ["RUF022"]
+"byte/adapter/runtime.py" = ["RUF022"]

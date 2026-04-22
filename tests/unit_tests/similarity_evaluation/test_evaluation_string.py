@@ -1,0 +1,26 @@
+import math
+
+from byte.adapter.api import _get_eval
+from byte.similarity_evaluation import ExactMatchEvaluation
+
+
+def _test_evaluation(evaluation) -> None:
+    range_min, range_max = evaluation.range()
+    assert math.isclose(range_min, 0.0)
+    assert math.isclose(range_max, 1.0)
+
+    score = evaluation.evaluation({"question": "hello"}, {"question": "hello"})
+    assert math.isclose(score, 1.0)
+
+    score = evaluation.evaluation({"question": "tello"}, {"question": "hello"})
+    assert math.isclose(score, 0.0)
+
+
+def test_exact_match_evaluation() -> None:
+    evaluation = ExactMatchEvaluation()
+    _test_evaluation(evaluation)
+
+
+def test_get_eval() -> None:
+    evaluation = _get_eval("exact")
+    _test_evaluation(evaluation)

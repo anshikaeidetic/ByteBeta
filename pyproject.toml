@@ -1,0 +1,246 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "byteai-cache"
+version = "1.0.6"
+description = "Byte is a production semantic cache and OpenAI-compatible gateway for AI workloads."
+readme = "README.md"
+license = "LicenseRef-ByteAI-Proprietary"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [
+    {name = "Byte"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=2,<2.3",
+    "cachetools>=7,<8",
+    "requests>=2.33,<3",
+    "cryptography>=46,<47",
+    "httpx>=0.28,<1",
+    "tomli>=2.3,<3; python_version<'3.11'",
+    "ruamel.yaml>=0.19,<0.20",
+]
+
+[project.optional-dependencies]
+openai = ["openai>=2.30,<3"]
+anthropic = ["anthropic>=0.88,<1"]
+gemini = ["google-generativeai>=0.8,<1"]
+ollama = ["ollama>=0.6,<1"]
+groq = ["groq>=1.1,<2"]
+bedrock = ["boto3>=1.40,<2"]
+sql = ["sqlalchemy>=2.0,<3"]
+huggingface = [
+    "transformers>=4.48,<6",
+    "torch>=2.6,<3",
+    "accelerate>=1.12,<2",
+    "networkx>=3.4,<3.5",
+    "sentencepiece>=0.2.1,<0.3",
+]
+langchain = [
+    "langchain>=1.2,<2",
+    "langchain-core>=1.2,<2",
+    "langchain-openai>=1.1.14,<2",
+    "langchain-anthropic>=1.4,<2",
+    "langsmith>=0.7.31,<1",
+    "redis>=7,<8",
+]
+benchmark = [
+    "openai>=2.30,<3",
+    "anthropic>=0.88,<1",
+    "redis>=7,<8",
+    "langchain>=1.2,<2",
+    "langchain-core>=1.2,<2",
+    "langchain-openai>=1.1.14,<2",
+    "langchain-anthropic>=1.4,<2",
+    "langsmith>=0.7.31,<1",
+]
+test = [
+    "openai>=2.30,<3",
+    "google-generativeai>=0.8,<1",
+    "groq>=1.1,<2",
+    "ollama>=0.6,<1",
+    "boto3>=1.40,<2",
+    "sqlalchemy>=2.0,<3",
+    "transformers>=4.48,<6",
+    "torch>=2.6,<3",
+    "torchaudio>=2.6,<3",
+    "accelerate>=1.12,<2",
+    "networkx>=3.4,<3.5",
+    "sentencepiece>=0.2.1,<0.3",
+    "pyyaml>=6,<7",
+    "pillow>=12.1.1,<13",
+]
+observability = [
+    "opentelemetry-api>=1.37,<1.38",
+    "opentelemetry-sdk>=1.37,<1.38",
+]
+server = [
+    "fastapi>=0.135,<1",
+    "uvicorn>=0.42,<1",
+    "pydantic>=2.12,<3",
+    "python-multipart>=0.0.22,<1",
+    "opentelemetry-api>=1.37,<1.38",
+    "opentelemetry-sdk>=1.37,<1.38",
+    "opentelemetry-exporter-otlp-proto-http>=1.37,<1.38",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.37,<1.38",
+]
+faiss = ["faiss-cpu>=1.11,<2"]
+onnx = [
+    "onnxruntime>=1.20,<2; python_version>='3.11'",
+    "transformers>=4.48,<6",
+    "huggingface-hub>=1.10,<2",
+    "sentencepiece>=0.2.1,<0.3",
+]
+operator = ["kopf>=1.38,<2", "kubernetes>=34,<35", "pyyaml>=6,<7"]
+all = [
+    "openai>=2.30,<3",
+    "anthropic>=0.88,<1",
+    "google-generativeai>=0.8,<1",
+    "ollama>=0.6,<1",
+    "groq>=1.1,<2",
+    "boto3>=1.40,<2",
+    "sqlalchemy>=2.0,<3",
+    "transformers>=4.48,<6",
+    "torch>=2.6,<3",
+    "accelerate>=1.12,<2",
+    "networkx>=3.4,<3.5",
+    "sentencepiece>=0.2.1,<0.3",
+    "redis>=7,<8",
+    "langchain>=1.2,<2",
+    "langchain-core>=1.2,<2",
+    "langchain-openai>=1.1.14,<2",
+    "langchain-anthropic>=1.4,<2",
+    "langsmith>=0.7.31,<1",
+    "opentelemetry-api>=1.37,<1.38",
+    "opentelemetry-sdk>=1.37,<1.38",
+    "fastapi>=0.135,<1",
+    "uvicorn>=0.42,<1",
+    "pydantic>=2.12,<3",
+    "python-multipart>=0.0.22,<1",
+    "opentelemetry-exporter-otlp-proto-http>=1.37,<1.38",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.37,<1.38",
+    "faiss-cpu>=1.11,<2",
+    "onnxruntime>=1.20,<2; python_version>='3.11'",
+    "kopf>=1.38,<2",
+    "kubernetes>=34,<35",
+    "pyyaml>=6,<7",
+]
+dev = [
+    "pytest>=9,<10",
+    "pytest-cov>=7,<8",
+    "pytest-asyncio>=1.3,<2",
+    "hypothesis>=6.151,<7",
+    "black>=26.3,<27",
+    "build>=1.4,<2",
+    "mypy>=1.20,<2",
+    "opentelemetry-api>=1.37,<1.38",
+    "opentelemetry-sdk>=1.37,<1.38",
+    "pip-tools>=7.5,<8",
+    "pre-commit>=4.5,<5",
+    "ruff>=0.15,<0.16",
+    "twine>=6.2,<7",
+    "wheel>=0.46,<1",
+]
+security = [
+    "bandit>=1.9,<2",
+    "detect-secrets>=1.5,<2",
+    "pip-audit>=2.10,<3",
+]
+
+[project.scripts]
+byte = "byte.cli:main"
+byte_inference = "byte_inference.server:main"
+byte_memory = "byte_memory.server:main"
+byte_server = "byte_server.server:main"
+byte_operator = "byte_server.operator:main"
+
+[project.urls]
+Homepage = "https://github.com/anshikaeidetic/ByteNew"
+Repository = "https://github.com/anshikaeidetic/ByteNew"
+
+[tool.setuptools]
+include-package-data = true
+packages = {find = {where = ["."], include = ["byte*", "byte_server*", "byte_inference*", "byte_memory*"], namespaces = false}}
+
+[tool.setuptools.package-data]
+"byte.benchmarking" = ["workloads/*.json"]
+"byte.trust" = ["calibration/*.json"]
+"byte.trust.calibration" = ["*.json"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.pyc", "*.pyo", "__pycache__/*", ".pytest_cache/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "strict"
+addopts = "-v -s --import-mode=importlib"
+log_format = "[%(asctime)s - %(levelname)s - %(name)s]: %(message)s (%(filename)s:%(lineno)s)"
+log_date_format = "%Y-%m-%d %H:%M:%S"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+markers = [
+    "tags(name): legacy integration test classification marker",
+    "integration_live: requires external services and is skipped unless --run-live-integration is set",
+    "integration_mocked: exercises service-like integration flows against in-process mocks",
+    "benchmark_regression: validates committed benchmark artifacts against regression thresholds",
+    "property: property-based tests for numeric and edge-case invariants",
+    "requires_feature(*names): skips when one or more optional Byte feature stacks are unavailable",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.coverage.run]
+source = ["byte", "byte_server"]
+omit = [
+    "byte/_backends/llama_cpp.py",
+    "byte/adapter/_runtime_memory.py",
+    "byte/adapter/_runtime_response.py",
+    "byte/adapter/_runtime_verification.py",
+    "byte/adapter/llama_cpp.py",
+    "byte/adapter/runtime.py",
+    "byte/benchmarking/systems.py",
+    "byte/benchmarking/_program_impl/*",
+    "byte/benchmarking/_workload_impl/*",
+    "byte/benchmarking/programs/*",
+    "byte/benchmarking/workload_generator.py",
+    "byte/embedding/cohere.py",
+    "byte/embedding/data2vec.py",
+    "byte/embedding/fasttext.py",
+    "byte/embedding/huggingface.py",
+    "byte/embedding/paddlenlp.py",
+    "byte/embedding/rwkv.py",
+    "byte/embedding/sbert.py",
+    "byte/embedding/timm.py",
+    "byte/embedding/uform.py",
+    "byte/embedding/vit.py",
+    "byte/h2o/_runtime_common.py",
+    "byte/h2o/_runtime_engine.py",
+    "byte/h2o/_runtime_kv.py",
+    "byte/processor/_optimization_common.py",
+    "byte/processor/context/selective_context.py",
+    "byte/processor/context/summarization_context.py",
+    "byte/processor/memory_export.py",
+    "byte/prompt_distillation/offline.py",
+    "byte/similarity_evaluation/cohere_rerank.py",
+    "byte/similarity_evaluation/kreciprocal.py",
+    "byte/similarity_evaluation/sbert_crossencoder.py",
+    "byte/utils/dependency_control.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

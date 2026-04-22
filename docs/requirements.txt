@@ -1,0 +1,13 @@
+sphinx==7.4.7
+urllib3==2.6.3
+pyqt5==5.12.3
+pyqtwebengine==5.12.1
+nbsphinx==0.9.7
+autodoc_pydantic==2.2.0
+myst_nb==1.2.0
+sphinx-autobuild==2024.10.3
+sphinx_book_theme==1.1.4
+sphinx-panels==0.6.0
+sphinx_copybutton==0.5.2
+m2r2==0.3.4
+sphinx_toolbox==3.8.1

@@ -1,0 +1,107 @@
+{
+  "deep_openai_coding_benchmark": {
+    "cheap_model": "gpt-4o-mini",
+    "expensive_model": "gpt-4o",
+    "byte_modes": ["exact", "normalized", "hybrid"],
+    "pricing": {
+      "gpt-4o-mini": {"input": 0.15, "cached_input": 0.075, "output": 0.60},
+      "gpt-4o": {"input": 2.50, "cached_input": 1.25, "output": 10.00}
+    },
+    "pricing_sources": [
+      "https://openai.com/api/pricing/",
+      "https://platform.openai.com/docs/pricing"
+    ],
+    "verified_on": "2026-03-10"
+  },
+  "deep_openai_surface_benchmark": {
+    "text_modes": ["exact", "normalized", "hybrid"],
+    "media_modes": ["exact", "normalized"]
+  },
+  "deep_openai_100_request_mixed_benchmark": {
+    "text_request_count": 60,
+    "moderation_request_count": 10,
+    "image_request_count": 10,
+    "speech_request_count": 10,
+    "transcription_request_count": 10,
+    "video_support": {
+      "status": "unsupported",
+      "reason": "The shared runtime can normalize multimodal video parts, but this repo does not yet ship a dedicated live video request runner or benchmark harness for any adapter."
+    }
+  },
+  "deep_openai_1000_request_mixed_benchmark": {
+    "text_waves": 8,
+    "text_requests_per_wave": 100,
+    "moderation_request_count": 80,
+    "image_request_count": 40,
+    "speech_request_count": 40,
+    "transcription_request_count": 40,
+    "video_support": {
+      "status": "unsupported",
+      "reason": "The shared runtime can normalize multimodal video parts, but this repo does not yet ship a dedicated live video request runner or benchmark harness for any adapter."
+    }
+  },
+  "deep_deepseek_runtime_optimization_benchmark": {
+    "benchmark_version": "1.0",
+    "provider": "DeepSeek",
+    "chat_model": "deepseek-chat",
+    "coding_model": "deepseek-coder",
+    "api_base": "https://api.deepseek.com",
+    "verified_on": "2026-03-14",
+    "total_requests": 1200,
+    "execution_waves": 12,
+    "requests_per_wave": 100,
+    "concurrency": 5,
+    "warmup_requests": 50,
+    "timeout_seconds": 60.0,
+    "retries": 0,
+    "scenario_order": [
+      "exact_repeat",
+      "normalized_variant",
+      "plain_unique",
+      "shared_context_unique",
+      "rag_queries",
+      "coding_tasks",
+      "agent_workflows",
+      "long_context"
+    ],
+    "scenario_requests": {
+      "exact_repeat": 150,
+      "normalized_variant": 150,
+      "plain_unique": 150,
+      "shared_context_unique": 250,
+      "rag_queries": 200,
+      "coding_tasks": 150,
+      "agent_workflows": 100,
+      "long_context": 50
+    },
+    "scenario_labels": {
+      "exact_repeat": "Exact Repeat",
+      "normalized_variant": "Normalized Variant",
+      "plain_unique": "Plain Unique",
+      "shared_context_unique": "Shared Context Unique",
+      "rag_queries": "RAG Queries",
+      "coding_tasks": "Coding Tasks",
+      "agent_workflows": "Agent Workflows",
+      "long_context": "Long Context"
+    },
+    "scenario_purposes": {
+      "exact_repeat": "Measure deterministic cache reuse.",
+      "normalized_variant": "Test semantic normalization across prompt wrappers.",
+      "plain_unique": "Baseline LLM behavior on one-off prompts.",
+      "shared_context_unique": "Test unique-prompt savings from shared context reuse.",
+      "rag_queries": "Simulate document retrieval and extraction workloads.",
+      "coding_tasks": "Simulate developer AI tasks with verified coding reuse.",
+      "agent_workflows": "Simulate multi-step planning and workflow decisions.",
+      "long_context": "Evaluate long-context prompt handling."
+    },
+    "pricing": {
+      "deepseek-chat": {"input": 0.28, "cached_input": 0.028, "output": 0.42},
+      "deepseek-coder": {"input": 0.28, "cached_input": 0.028, "output": 0.42},
+      "deepseek-reasoner": {"input": 0.56, "cached_input": 0.14, "output": 2.19}
+    },
+    "pricing_sources": [
+      "https://api-docs.deepseek.com/quick_start/pricing",
+      "https://api-docs.deepseek.com/news/news250825"
+    ]
+  }
+}

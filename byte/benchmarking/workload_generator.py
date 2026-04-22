@@ -1,0 +1,51 @@
+"""Compatibility shim for the benchmark workload generator."""
+
+from __future__ import annotations
+
+from byte.benchmarking._workload_impl.generator import (
+    FAMILY_CONTAMINATION_STATUS,
+    FAMILY_LANES,
+    FAMILY_REFERENCE_SET,
+    PROVIDERS,
+    SYSTEM_PROMPT,
+    WORKLOAD_DIR,
+    WORKLOAD_GENERATOR_VERSION,
+    build_codebase_context,
+    build_compression_faithfulness,
+    build_degradation_unseen,
+    build_distillation_injection_resilience,
+    build_fuzzy_similarity,
+    build_generalization,
+    build_long_context_retrieval,
+    build_long_horizon_agents,
+    build_policy_bloat,
+    build_prompt_module_reuse,
+    build_real_world_chaos,
+    build_selective_augmentation,
+    build_wrong_reuse_detection,
+    write_workloads,
+)
+
+__all__ = [
+    "FAMILY_CONTAMINATION_STATUS",
+    "FAMILY_LANES",
+    "FAMILY_REFERENCE_SET",
+    "PROVIDERS",
+    "SYSTEM_PROMPT",
+    "WORKLOAD_DIR",
+    "WORKLOAD_GENERATOR_VERSION",
+    "build_codebase_context",
+    "build_compression_faithfulness",
+    "build_degradation_unseen",
+    "build_distillation_injection_resilience",
+    "build_fuzzy_similarity",
+    "build_generalization",
+    "build_long_context_retrieval",
+    "build_long_horizon_agents",
+    "build_policy_bloat",
+    "build_prompt_module_reuse",
+    "build_real_world_chaos",
+    "build_selective_augmentation",
+    "build_wrong_reuse_detection",
+    "write_workloads",
+]

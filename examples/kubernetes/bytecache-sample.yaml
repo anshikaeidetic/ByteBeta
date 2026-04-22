@@ -1,0 +1,72 @@
+apiVersion: byte.ai/v1alpha1
+kind: ByteCache
+metadata:
+  name: byteai-cache
+  namespace: default
+spec:
+  image: byteai-cache:latest
+  replicas: 2
+  port: 8000
+  cacheDir: /var/lib/byteai/cache
+  serviceType: ClusterIP
+  persistence:
+    enabled: true
+    size: 10Gi
+    mountPath: /var/lib/byteai/cache
+  internalAuthSecretRef:
+    name: byte-internal
+    key: token
+  gateway:
+    enabled: true
+    cacheMode: normalized
+    mode: backend
+    env:
+      - name: BYTE_ADMIN_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: byte-gateway
+            key: admin-token
+      - name: BYTE_BACKEND_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: byte-gateway
+            key: backend-api-key
+  security:
+    mode: true
+    requireHttps: true
+    trustProxyHeaders: true
+    auditLogPath: /var/log/byte/audit.jsonl
+    exportRoot: /var/lib/byteai/exports
+    rateLimitPublicPerMinute: 240
+    rateLimitAdminPerMinute: 60
+    maxInflightPublic: 64
+    maxInflightAdmin: 16
+  controlPlane:
+    dbPath: /var/lib/byteai/cache/control-plane.db
+    memoryServiceUrl: http://byteai-cache-memory.default.svc.cluster.local:8091
+    replayEnabled: true
+    replaySampleRate: 0.05
+    workerUrls:
+      - http://byteai-cache-inference.default.svc.cluster.local:8090
+  memory:
+    enabled: true
+    port: 8091
+  inferencePools:
+    - name: byteai-cache-inference
+      replicas: 1
+      port: 8090
+      models:
+        - huggingface/*
+  observability:
+    otelEnabled: true
+    endpoint: http://byteai-otel-collector.default.svc.cluster.local:4318
+    protocol: http/protobuf
+    environment: production
+    resourceAttributes:
+      team: platform
+      component: gateway
+    datadogEnabled: true
+    datadogAgentHost: datadog-agent.default.svc.cluster.local
+    datadogService: byteai-cache
+    datadogEnv: production
+    datadogVersion: "1.0.5"

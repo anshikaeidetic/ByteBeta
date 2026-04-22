@@ -1,0 +1,25 @@
+ByteAI Proprietary License
+Copyright (c) 2026 Byte. All rights reserved.
+
+This repository, including all source code, documentation, benchmark assets,
+and generated package artifacts distributed from it, is proprietary and
+confidential to Byte.
+
+Permission is granted to review and use this software only under a separate
+written agreement with Byte. No right is granted to copy, modify, distribute,
+publish, sublicense, sell, create derivative works from, or publicly disclose
+this software except as expressly authorized in that written agreement.
+
+Unless a separate written agreement states otherwise:
+
+1. You may not redistribute this repository or any substantial portion of it.
+2. You may not use Byte trademarks, trade dress, or branding except to
+   accurately identify Byte as the owner of the software.
+3. Reverse engineering, decompilation, and circumvention of technical controls
+   are prohibited to the maximum extent allowed by law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, TITLE, AND NON-INFRINGEMENT. BYTE WILL NOT BE LIABLE FOR ANY CLAIM,
+DAMAGES, OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT, OR OTHERWISE, ARISING
+FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OF THE SOFTWARE.

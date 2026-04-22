@@ -1,0 +1,290 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: bytecaches.byte.ai
+spec:
+  group: byte.ai
+  names:
+    kind: ByteCache
+    plural: bytecaches
+    singular: bytecache
+    shortNames:
+      - bc
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                image:
+                  type: string
+                replicas:
+                  type: integer
+                  minimum: 1
+                port:
+                  type: integer
+                cacheDir:
+                  type: string
+                serviceType:
+                  type: string
+                imagePullPolicy:
+                  type: string
+                serviceAccountName:
+                  type: string
+                labels:
+                  type: object
+                  additionalProperties:
+                    type: string
+                podAnnotations:
+                  type: object
+                  additionalProperties:
+                    type: string
+                serviceAnnotations:
+                  type: object
+                  additionalProperties:
+                    type: string
+                env:
+                  type: array
+                  items:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                envFrom:
+                  type: array
+                  items:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                internalAuthSecretRef:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    key:
+                      type: string
+                volumes:
+                  type: array
+                  items:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                volumeMounts:
+                  type: array
+                  items:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                resources:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                nodeSelector:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                affinity:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                tolerations:
+                  type: array
+                  items:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                strategy:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                persistence:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                    size:
+                      type: string
+                    storageClassName:
+                      type: string
+                    mountPath:
+                      type: string
+                    accessModes:
+                      type: array
+                      items:
+                        type: string
+                gateway:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                    env:
+                      type: array
+                      items:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                    envFrom:
+                      type: array
+                      items:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                    cacheMode:
+                      type: string
+                    mode:
+                      type: string
+                    enableRouting:
+                      type: boolean
+                    cheapRouteTarget:
+                      type: string
+                    expensiveRouteTarget:
+                      type: string
+                    toolRouteTarget:
+                      type: string
+                    defaultRouteTarget:
+                      type: string
+                    coderRouteTarget:
+                      type: string
+                    reasoningRouteTarget:
+                      type: string
+                    verifierRouteTarget:
+                      type: string
+                observability:
+                  type: object
+                  properties:
+                    otelEnabled:
+                      type: boolean
+                    endpoint:
+                      type: string
+                    protocol:
+                      type: string
+                    headers:
+                      x-kubernetes-preserve-unknown-fields: true
+                    insecure:
+                      type: boolean
+                    disableTraces:
+                      type: boolean
+                    disableMetrics:
+                      type: boolean
+                    exportIntervalMs:
+                      type: integer
+                    serviceNamespace:
+                      type: string
+                    environment:
+                      type: string
+                    resourceAttributes:
+                      x-kubernetes-preserve-unknown-fields: true
+                    datadogEnabled:
+                      type: boolean
+                    datadogAgentHost:
+                      type: string
+                    datadogService:
+                      type: string
+                    datadogEnv:
+                      type: string
+                    datadogVersion:
+                      type: string
+                security:
+                  type: object
+                  properties:
+                    mode:
+                      type: boolean
+                    adminToken:
+                      type: string
+                    auditLogPath:
+                      type: string
+                    exportRoot:
+                      type: string
+                    requireHttps:
+                      type: boolean
+                    trustProxyHeaders:
+                      type: boolean
+                    allowProviderHostOverride:
+                      type: boolean
+                    allowedEgressHosts:
+                      type: string
+                    maxRequestBytes:
+                      type: integer
+                    maxUploadBytes:
+                      type: integer
+                    maxArchiveBytes:
+                      type: integer
+                    maxArchiveMembers:
+                      type: integer
+                    rateLimitPublicPerMinute:
+                      type: integer
+                    rateLimitAdminPerMinute:
+                      type: integer
+                    maxInflightPublic:
+                      type: integer
+                    maxInflightAdmin:
+                      type: integer
+                controlPlane:
+                  type: object
+                  properties:
+                    dbPath:
+                      type: string
+                    memoryServiceUrl:
+                      type: string
+                    replayEnabled:
+                      type: boolean
+                    replaySampleRate:
+                      type: number
+                    workerUrls:
+                      type: array
+                      items:
+                        type: string
+                memory:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                    image:
+                      type: string
+                    port:
+                      type: integer
+                    replicas:
+                      type: integer
+                    env:
+                      type: array
+                      items:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                    envFrom:
+                      type: array
+                      items:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                    resources:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                inferencePools:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      image:
+                        type: string
+                      replicas:
+                        type: integer
+                      port:
+                        type: integer
+                      models:
+                        type: array
+                        items:
+                          type: string
+                      env:
+                        type: array
+                        items:
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                      envFrom:
+                        type: array
+                        items:
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                      resources:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                extraArgs:
+                  type: array
+                  items:
+                    type: string
+      subresources:
+        status: {}

@@ -1,0 +1,47 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=5120"]
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: trailing-whitespace
+      - id: check-yaml
+        args: ["--allow-multiple-documents"]
+  - repo: local
+    hooks:
+      - id: repo-verify
+        name: repo verify
+        entry: python scripts/run_with_repo_python.py scripts/run_tox.py -e hygiene,lint,typecheck,package,compile
+        language: python
+        pass_filenames: false
+        stages: [pre-push]
+      - id: repo-unit-tests
+        name: repo unit tests
+        entry: python scripts/run_with_repo_python.py scripts/run_unit_tests.py
+        language: python
+        pass_filenames: false
+        stages: [pre-push]
+      - id: repo-coverage
+        name: repo coverage
+        entry: python scripts/run_with_repo_python.py scripts/run_coverage.py
+        language: python
+        pass_filenames: false
+        stages: [pre-push]
+      - id: repo-integration-smoke
+        name: repo integration smoke
+        entry: python scripts/run_with_repo_python.py scripts/run_integration_smoke.py
+        language: python
+        pass_filenames: false
+        stages: [pre-push]
+      - id: repo-security
+        name: repo security checks
+        entry: python scripts/run_with_repo_python.py scripts/run_security_checks.py
+        language: python
+        pass_filenames: false
+        stages: [pre-push]

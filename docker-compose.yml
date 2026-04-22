@@ -1,0 +1,62 @@
+# Development and evaluation only.
+# This Compose stack installs from the working tree on container start and is
+# not a production deployment pattern. Use the deployment and operator guides
+# for hardened Byte topologies.
+version: "3.9"
+
+services:
+  byte-control-plane:
+    image: python:3.11-slim
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: >
+      sh -c "pip install -e .[server] &&
+             python -m byte_server.server
+             --gateway True
+             --gateway-cache-mode exact
+             --host 0.0.0.0
+             --port 8000
+             --cache-dir byte_data
+             --control-plane-db byte_control_plane.db
+             --control-plane-worker-url http://byte-inference:8090
+             --memory-service-url http://byte-memory:8091"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - byte-inference
+      - byte-memory
+
+  byte-inference:
+    image: python:3.11-slim
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    environment:
+      BYTE_WORKER_ID: byte-worker-1
+      BYTE_WORKER_MODELS: huggingface/*
+    command: >
+      sh -c "pip install -e .[server,huggingface] &&
+             python -m byte_inference.server --host 0.0.0.0 --port 8090"
+    ports:
+      - "8090:8090"
+
+  byte-memory:
+    image: python:3.11-slim
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: >
+      sh -c "pip install -e .[server] &&
+             python -m byte_memory.server --host 0.0.0.0 --port 8091"
+    ports:
+      - "8091:8091"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: byte
+      POSTGRES_PASSWORD: byte
+      POSTGRES_DB: byte
+    ports:
+      - "5432:5432"

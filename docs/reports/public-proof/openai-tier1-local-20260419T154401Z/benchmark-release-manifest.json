@@ -1,0 +1,30 @@
+{
+  "run_id": "tier1-20260419T154401Z-5665dac5",
+  "commit_sha": "8a9a71555e7a3cde8ea3b607e2772e6a03c90a63",
+  "profile": "tier1",
+  "execution_mode": "partial",
+  "providers": [
+    "openai"
+  ],
+  "systems": [
+    "byte",
+    "direct",
+    "native_cache"
+  ],
+  "raw_records_path": "docs/reports/public-proof/openai-tier1-local-20260419T154401Z/local/engineering_report.json",
+  "summary_path": "docs/reports/public-proof/openai-tier1-local-20260419T154401Z/summary.json",
+  "checksums": {
+    "raw_records_path": "03fc8cbd3bd39b4da787951cdc57ed40a06bc69dd903f4f078dc22d3054f8407",
+    "summary_path": "23a239aff9e326fa5a1dacf877a0d228bb127ada94a4c6fa586f0e948f0018a2"
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "provider": "openai",
+    "live_mode": "off",
+    "live_status": "skipped: missing OPENAI_API_KEY"
+  },
+  "generated_at": "2026-04-19T15:44:14Z",
+  "release_gate_passed": false,
+  "public_proof_status": "public_reproducible"
+}

@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-04-19T15:44:14Z",
+  "provider": "openai",
+  "profile": "tier1",
+  "systems": [
+    "direct",
+    "native_cache",
+    "byte"
+  ],
+  "phases": [
+    "cold",
+    "warm_100"
+  ],
+  "live": "off",
+  "live_status": "skipped: missing OPENAI_API_KEY",
+  "rows": [
+    {
+      "section": "local",
+      "provider": "openai",
+      "system": "direct",
+      "phase": "cold",
+      "requests": 6,
+      "hit_rate": 0.0,
+      "p50_ms": 0.06,
+      "p95_ms": 0.11,
+      "cost_delta_pct": 0.0,
+      "quality_pass_rate": 1.0
+    },
+    {
+      "section": "local",
+      "provider": "openai",
+      "system": "direct",
+      "phase": "warm_100",
+      "requests": 6,
+      "hit_rate": 0.0,
+      "p50_ms": 0.04,
+      "p95_ms": 0.09,
+      "cost_delta_pct": 0.0,
+      "quality_pass_rate": 1.0
+    },
+    {
+      "section": "local",
+      "provider": "openai",
+      "system": "native_cache",
+      "phase": "cold",
+      "requests": 6,
+      "hit_rate": 0.0,
+      "p50_ms": 0.93,
+      "p95_ms": 1.37,
+      "cost_delta_pct": 0.0,
+      "quality_pass_rate": 1.0
+    },
+    {
+      "section": "local",
+      "provider": "openai",
+      "system": "native_cache",
+      "phase": "warm_100",
+      "requests": 6,
+      "hit_rate": 0.0,
+      "p50_ms": 0.66,
+      "p95_ms": 0.85,
+      "cost_delta_pct": 0.0,
+      "quality_pass_rate": 1.0
+    },
+    {
+      "section": "local",
+      "provider": "openai",
+      "system": "byte",
+      "phase": "cold",
+      "requests": 6,
+      "hit_rate": 0.0,
+      "p50_ms": 2.04,
+      "p95_ms": 10.89,
+      "cost_delta_pct": 85.45,
+      "quality_pass_rate": 1.0
+    },
+    {
+      "section": "local",
+      "provider": "openai",
+      "system": "byte",
+      "phase": "warm_100",
+      "requests": 6,
+      "hit_rate": 0.0,
+      "p50_ms": 1.08,
+      "p95_ms": 4.1,
+      "cost_delta_pct": 85.45,
+      "quality_pass_rate": 1.0
+    }
+  ],
+  "artifacts": {
+    "root": "artifacts\\benchmarks-public-proof\\20260419T154401Z",
+    "summary_json": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\summary.json",
+    "summary_markdown": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\summary.md",
+    "local": {
+      "engineering_json": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\local\\engineering_report.json",
+      "engineering_markdown": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\local\\engineering_report.md",
+      "executive_markdown": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\local\\executive_summary.md",
+      "reasoning_trace_json": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\local\\reasoning_graph.json",
+      "reasoning_graph_svg": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\local\\reasoning_graph.svg",
+      "reasoning_graph_html": "artifacts\\benchmarks-public-proof\\20260419T154401Z\\local\\reasoning_graph.html"
+    },
+    "live": {}
+  }
+}
