@@ -272,6 +272,7 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                         try:
                             _is_cache_hit = False
                             _last_dict_chunk: dict[str, Any] | None = None
+                            _distill_req = bool(chat_params.get("byte_prompt_distillation_mode"))
                             for stream_response in handler(
                                 cache_obj=runtime.gateway_cache,
                                 cache_skip=cache_skip,
@@ -279,9 +280,13 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                                 **chat_params,
                             ):
                                 if stream_response == "[DONE]":
-                                    _enqueue(
-                                        f"data: {json.dumps({'byte_features': _build_byte_features(_last_dict_chunk or {}, request, distill_requested=bool(chat_params.get("byte_prompt_distillation_mode")))})}\n\n"
-                                    )
+                                    _features_payload = json.dumps({
+                                        "byte_features": _build_byte_features(
+                                            _last_dict_chunk or {}, request,
+                                            distill_requested=_distill_req,
+                                        )
+                                    })
+                                    _enqueue(f"data: {_features_payload}\n\n")
                                     _enqueue("data: [DONE]\n\n")
                                     return
                                 if isinstance(stream_response, dict):
@@ -291,9 +296,13 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                                 _enqueue(f"data: {json.dumps(stream_response)}\n\n")
                                 if _is_cache_hit:
                                     time.sleep(0.005)
-                            _enqueue(
-                                f"data: {json.dumps({'byte_features': _build_byte_features(_last_dict_chunk or {}, request, distill_requested=bool(chat_params.get("byte_prompt_distillation_mode")))})}\n\n"
-                            )
+                            _features_payload = json.dumps({
+                                "byte_features": _build_byte_features(
+                                    _last_dict_chunk or {}, request,
+                                    distill_requested=_distill_req,
+                                )
+                            })
+                            _enqueue(f"data: {_features_payload}\n\n")
                             _enqueue("data: [DONE]\n\n")
                         except Exception as stream_exc:
                             _enqueue(f"data: {json.dumps({'error': {'message': str(stream_exc), 'type': 'stream_error'}})}\n\n")
