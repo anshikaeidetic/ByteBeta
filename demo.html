@@ -3515,10 +3515,12 @@ async function _sendByteOnce(text, messages, skipCache) {
    Direct request
 ═══════════════════════════════════════════════════════════════════════════ */
 async function sendDirect(text, messages) {
+  const byteUrl  = $('byteUrl').value.trim().replace(/\/$/,'');
   const apiKey   = sanitizeHeaderValue($('apiKey').value);
   const provider = $('provider').value;
-  const model    = $('modelSel').value || DEFAULT_MODELS[provider] || 'gpt-4o-mini';
+  const rawModel = $('modelSel').value || DEFAULT_MODELS[provider] || 'gpt-4o-mini';
   const prov     = PROVIDERS[provider];
+  const model    = prov.vertexMode ? _toByteVertexAlias(rawModel) : rawModel;
 
   // Local providers have no cloud API to compare against
   if (prov.localMode || provider === 'ollama' || provider === 'llamacpp') {
@@ -3533,40 +3535,38 @@ async function sendDirect(text, messages) {
     return;
   }
 
-  // Vertex AI: compute dynamic base URL from project + region
-  let apiBase = prov.base;
-  if (prov.vertexMode) {
-    apiBase = getVertexBase();
-    if (!apiBase) {
-      addErrMsg('directMsgs', 'Vertex AI: enter your GCP Project ID in the config.');
-      return;
-    }
-  }
-  const endpoint = `${apiBase}${prov.chatPath}`;
-
-  const headers  = { 'Content-Type': 'application/json' };
-  if (prov.authHeader === 'Authorization') headers['Authorization'] = `Bearer ${apiKey}`;
-  else {
-    headers[prov.authHeader] = apiKey;
-    if (prov.anthropicMode) headers['anthropic-version'] = '2023-06-01';
+  // Vertex AI needs a project ID even when going through Byte's alias
+  if (prov.vertexMode && !getVertexBase()) {
+    addErrMsg('directMsgs', 'Vertex AI: enter your GCP Project ID in the config.');
+    return;
   }
 
-  const sysPrompt = buildSystemPrompt();
-  const histMsgs  = (messages || []).filter(m => m.role !== 'system');
+  // Direct comparisons now route through Byte with cache_skip=true so the request
+  // reaches the provider server-side (browser CORS blocks provider APIs in
+  // production). Cached vs uncached comparison is preserved — cache_skip=true
+  // makes Byte forward to the provider every time.
+  const BYTE_PROVIDER_MAP = {
+    openai:      'openai',    anthropic: 'anthropic', groq:     'groq',       mistral:  'mistral',
+    google:      'gemini',    deepseek:  'deepseek',  cohere:   'cohere',     openrouter:'openrouter',
+    vertex:      '',          huggingface: 'huggingface',
+  };
+  const providerHint = BYTE_PROVIDER_MAP[provider] || '';
 
-  // Anthropic uses a different request schema + different multi-part image format
-  const apiMessages = prov.anthropicMode
-    ? histMsgs.map(m => ({ role:m.role, content:toAnthropicContent(m.content) }))
-    : histMsgs;
-  const body = prov.anthropicMode
-    ? { model, messages: apiMessages, max_tokens: prov.maxTokens, stream: S.streaming, system: sysPrompt }
-    : { model, messages: [{ role:'system', content:sysPrompt }, ...apiMessages], stream: S.streaming, ...(prov.maxTokens ? { max_tokens: prov.maxTokens } : {}) };
+  const headers  = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey || 'local'}` };
+  if (providerHint) headers['X-Byte-Provider'] = providerHint;
+
+  const body = {
+    model,
+    messages: prependSystem(messages),
+    stream: S.streaming,
+    cache_skip: true,
+  };
 
   addTyping('directMsgs');
   const t0 = performance.now();
 
   try {
-    const resp = await fetch(endpoint, { method:'POST', headers, body:JSON.stringify(body) });
+    const resp = await fetch(`${byteUrl}/v1/chat/completions`, { method:'POST', headers, body:JSON.stringify(body) });
     if (!resp.ok) {
       const errText = await resp.text().catch(()=>'');
       throw new Error(`HTTP ${resp.status}: ${errText.slice(0,180)}`);
