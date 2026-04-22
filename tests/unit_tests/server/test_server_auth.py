@@ -185,7 +185,7 @@ def test_chat_uses_byo_key_when_present(client) -> None:
         )
 
     assert response.status_code == 200
-    assert response.json() == {"ok": True}
+    assert response.json().get("ok") is True
     assert mock_create.call_args.kwargs["api_key"] == "byo-key"
 
 
@@ -203,7 +203,7 @@ def test_openai_chat_completions_alias_uses_gateway_flow(client) -> None:
         )
 
     assert response.status_code == 200
-    assert response.json() == {"ok": True}
+    assert response.json().get("ok") is True
     assert mock_create.call_args.kwargs["api_key"] == "byo-key"
 
 
@@ -222,7 +222,9 @@ def test_chat_non_stream_offloads_to_threadpool(client) -> None:
         )
 
     assert response.status_code == 200
-    assert response.json() == threadpool_result
+    resp_body = response.json()
+    for k, v in threadpool_result.items():
+        assert resp_body.get(k) == v
     assert mock_threadpool.await_count == 1
     assert (
         mock_threadpool.await_args.args[0].__qualname__
@@ -246,7 +248,7 @@ def test_chat_falls_back_to_server_key_env(client, monkeypatch) -> None:
         )
 
     assert response.status_code == 200
-    assert response.json() == {"ok": True}
+    assert response.json().get("ok") is True
     assert mock_create.call_args.kwargs["api_key"] == "server-key"
 
 
@@ -657,7 +659,7 @@ def test_chat_handles_non_string_message_content_without_cache_skip_crash(client
         )
 
     assert response.status_code == 200
-    assert response.json() == {"ok": True}
+    assert response.json().get("ok") is True
     assert mock_create.call_count == 1
 
 

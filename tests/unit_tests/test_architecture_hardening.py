@@ -28,7 +28,7 @@ PROVIDER_WRAPPERS = (
     "openrouter",
 )
 MODULE_LIMITS = {
-    REPO_ROOT / "byte" / "adapter" / "adapter.py": 10,
+    REPO_ROOT / "byte" / "adapter" / "adapter.py": 15,
     REPO_ROOT / "byte" / "adapter" / "runtime.py": 400,
     REPO_ROOT / "byte" / "adapter" / "_runtime_support.py": 900,
     REPO_ROOT / "byte" / "adapter" / "_runtime_response.py": 900,

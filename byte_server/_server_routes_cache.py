@@ -196,8 +196,10 @@ def register_cache_routes(app: FastAPI, services: ServerServices) -> None:
             raise HTTPException(status_code=500, detail=f"Mode change failed: {exc}") from exc
 
         # Update the module-level global so sync_runtime_state propagates it.
-        import byte_server.server as _server_module
-        _server_module.gateway_cache_mode = requested
+        import sys as _sys
+        _srv = _sys.modules.get("byte_server.server")
+        if _srv is not None:
+            _srv.gateway_cache_mode = requested
 
         _audit_event(
             services,
