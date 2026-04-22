@@ -2928,7 +2928,12 @@ async function connect() {
   }
 
   syncModeFromServer().catch(() => {});
-  warmDemoCache().catch(() => {});
+  // Auto-warm disabled for cloud deployments — warm Q&A pairs use plain-text format
+  // which the streaming chat handler misinterprets as stale cache entries.
+  // Use the admin panel "Warm cache" button for manual warming instead.
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    warmDemoCache().catch(() => {});
+  }
   await fetchModels(true);
   _updateColSubtitles();
 
