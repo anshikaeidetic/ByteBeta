@@ -669,6 +669,18 @@
     .mbtab.active { color: var(--byte); border-bottom-color: var(--byte); font-weight: 600; }
     .mbtab:focus-visible { outline: none; background: var(--byte-soft); }
 
+    /* ── Paper info (i) button ─────────────────────────────────────────── */
+    .paper-info-i {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1px solid var(--border-mid); background: var(--surface);
+      color: var(--text-3); font-size: 10px; font-weight: 700;
+      cursor: help; padding: 0; line-height: 1; font-family: var(--sans);
+      vertical-align: middle; margin-left: 5px; position: relative;
+      transition: all .15s;
+    }
+    .paper-info-i:hover { border-color: var(--byte); color: var(--byte); background: var(--byte-light); }
+
     /* ── Research panel ───────────────────────────────────────────────── */
     .papers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
     .paper-card { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; background: var(--surface-raised); display: flex; flex-direction: column; gap: 8px; }
@@ -1185,7 +1197,7 @@
     <button class="mbtab"        id="mbtab-generate"     onclick="setAppMode('generate')">Generate</button>
     <button class="mbtab"        id="mbtab-intelligence" onclick="setAppMode('intelligence')">Intelligence</button>
     <button class="mbtab"        id="mbtab-dashboard"    onclick="setAppMode('dashboard')">Dashboard</button>
-    <button class="mbtab"        id="mbtab-research"     onclick="setAppMode('research')">Research</button>
+    <button class="mbtab"        id="mbtab-research"     onclick="setAppMode('research')">Optimizations</button>
     <button class="mbtab"        id="mbtab-admin"        onclick="setAppMode('admin')">Admin</button>
   </div>
 
@@ -1346,8 +1358,8 @@
   <!-- ── Intelligence Panel ───────────────────────────────────────────── -->
   <div class="mode-panel" id="panel-intelligence">
     <div>
-      <div class="mode-panel-title">Auto Intelligence</div>
-      <div class="mode-panel-sub">Byte selects the optimal combination of 13 peer-reviewed algorithms automatically. Pick a goal — no per-feature configuration needed.</div>
+      <div class="mode-panel-title">Byte Auto Intelligence</div>
+      <div class="mode-panel-sub">Byte automatically selects the optimal combination of optimizations for your workload. Just pick a goal — no manual configuration needed.</div>
     </div>
 
     <div class="ai-section-label">Optimization goal</div>
@@ -1379,7 +1391,7 @@
       <li><span class="ai-dot"></span><span style="color:var(--text-3); font-style:italic">Select a goal above to activate algorithms.</span></li>
     </ul>
 
-    <a class="ai-link" href="#" onclick="setAppMode('research'); return false;">View Research panel for expert controls</a>
+    <a class="ai-link" href="#" onclick="setAppMode('research'); return false;">View Optimizations panel for expert controls</a>
   </div>
 
   <!-- ── Dashboard Panel ───────────────────────────────────────────────── -->
@@ -1405,7 +1417,7 @@
     </div>
 
     <div style="height:20px;"></div>
-    <div class="sec-header"><div><div class="sec-title">ROI by feature</div><div class="sec-sub">Projected savings from each research algorithm</div></div></div>
+    <div class="sec-header"><div><div class="sec-title">ROI by feature</div><div class="sec-sub">Projected savings from each Byte optimization</div></div></div>
     <div id="dashROI"><div class="data-table-wrap"><div style="padding:16px;color:var(--text-3);font-size:12.5px;">Loading…</div></div></div>
 
     <div style="height:20px;"></div>
@@ -1429,10 +1441,10 @@
       <a href="#" onclick="setAppMode('intelligence'); return false;">Manage</a>
     </div>
     <div>
-      <div class="mode-panel-title">Active Research Features</div>
+      <div class="mode-panel-title">Byte Optimization Engine</div>
       <div class="mode-panel-sub">
-        14 peer-reviewed algorithms. Toggles call <code>PATCH /config</code> and take effect without restart.
-        Metrics auto-refresh every 10 s from <code>/metrics</code>.
+        16 research-backed optimizations that make your AI cheaper, faster, and more accurate.
+        Toggle any feature on or off — changes take effect instantly, no restart needed.
       </div>
     </div>
     <div class="papers-grid" id="papersGrid">
@@ -1443,8 +1455,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2311.04934" target="_blank">arXiv ↗</a>
           <span class="paper-status active" id="ps-prompt-module">Active</span>
         </div>
-        <div class="paper-title">Prompt Cache: Modular Attention Reuse</div>
-        <div class="paper-desc">Named prompt modules are mapped to reusable KV-cache attention states, cutting TTFT for repeated system-prompt segments.</div>
+        <div class="paper-title">Prompt Reuse <button type="button" class="paper-info-i" title="Caches repeated system prompts so they don't need to be re-processed each time, reducing first-token latency by reusing attention states across requests.">i</button></div>
+        <div class="paper-desc">Automatically detects and reuses repeated prompt patterns, so identical system instructions are processed only once — cutting response time.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-prompt-module" onchange="patchConfig('prompt_module_mode', this.checked ? 'enabled' : 'disabled')">
@@ -1461,8 +1473,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2310.06839" target="_blank">arXiv ↗</a>
           <span class="paper-status active" id="ps-distillation">Active</span>
         </div>
-        <div class="paper-title">LongLLMLingua: Query-Aware Prompt Compression</div>
-        <div class="paper-desc">Compresses long prompts using a small language model with query-aware importance scoring, reducing tokens 50–80%.</div>
+        <div class="paper-title">Smart Compression <button type="button" class="paper-info-i" title="LongLLMLingua: Uses a small model to intelligently compress long prompts by scoring which parts matter most for your query, reducing tokens by 50–80%.">i</button></div>
+        <div class="paper-desc">Intelligently shrinks long prompts by keeping only the most relevant parts, saving 50–80% of token costs without losing answer quality.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <select class="paper-codec-select" onchange="patchConfig('prompt_distillation_mode', this.value)">
@@ -1484,8 +1496,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2403.12968" target="_blank">arXiv ↗</a>
           <span class="paper-status active">Active</span>
         </div>
-        <div class="paper-title">LLMLingua-2: Task-Agnostic Distillation Backend</div>
-        <div class="paper-desc">Trains a classification model on distilled annotations to compress prompts without task-specific tuning.</div>
+        <div class="paper-title">Universal Compression Engine <button type="button" class="paper-info-i" title="LLMLingua-2: A task-agnostic compression backend that works across any use case without special tuning, using learned distillation to remove redundant tokens.">i</button></div>
+        <div class="paper-desc">A general-purpose compression engine that works across all types of prompts — no task-specific setup needed.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <select class="paper-codec-select" onchange="patchConfig('prompt_distillation_backend', this.value)">
@@ -1506,8 +1518,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2310.06201" target="_blank">arXiv ↗</a>
           <span class="paper-status active" id="ps-ctx-compiler">Active</span>
         </div>
-        <div class="paper-title">Compressing Context to Enhance Inference Efficiency</div>
-        <div class="paper-desc">Selectively removes less-relevant sentences from the context window, cutting prompt tokens without quality loss.</div>
+        <div class="paper-title">Context Optimizer <button type="button" class="paper-info-i" title="Context Pruning (2310.06201): Selectively removes less-relevant sentences from the context window, cutting prompt tokens without quality loss.">i</button></div>
+        <div class="paper-desc">Automatically trims irrelevant context from your prompts, reducing token usage while preserving answer accuracy.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-ctx-compiler" onchange="patchConfig('context_compiler', this.checked)">
@@ -1524,8 +1536,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2310.04408" target="_blank">arXiv ↗</a>
           <span class="paper-status active">Active</span>
         </div>
-        <div class="paper-title">RECOMP: Selective Augmentation for RAG</div>
-        <div class="paper-desc">Filters retrieved documents with an extractive or abstractive compressor before augmenting the context, improving precision.</div>
+        <div class="paper-title">RAG Filter <button type="button" class="paper-info-i" title="RECOMP (2310.04408): Filters retrieved documents before they're added to context, keeping only the most relevant passages to improve precision and reduce cost.">i</button></div>
+        <div class="paper-desc">Filters retrieved documents before adding them to context, keeping only the most relevant passages for better precision and lower costs.</div>
         <div class="paper-controls">
           <div class="paper-info-box">Integrated into context_compiler pipeline. Enable context_compiler to activate RECOMP selective augmentation.</div>
         </div>
@@ -1539,8 +1551,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2502.03771" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-vcache">Standby</span>
         </div>
-        <div class="paper-title">vCache: Verified Semantic Prompt Caching</div>
-        <div class="paper-desc">UC Berkeley Sky Lab. Per-prompt learned sigmoid threshold with formal error-rate guarantee δ, fitted via online logistic regression.</div>
+        <div class="paper-title">Verified Cache <button type="button" class="paper-info-i" title="vCache (2502.03771, UC Berkeley Sky Lab): Uses a learned per-prompt threshold with formal error-rate guarantee δ to ensure cached responses are only served when quality is assured.">i</button></div>
+        <div class="paper-desc">Smart caching that mathematically guarantees response quality — only serves cached results when confidence exceeds your threshold.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-vcache" onchange="patchConfig('vcache_enabled', this.checked); document.getElementById('ps-vcache').textContent = this.checked ? 'Active' : 'Standby'; document.getElementById('ps-vcache').className = 'paper-status ' + (this.checked ? 'active' : 'standby')">
@@ -1567,8 +1579,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2407.02211" target="_blank">arXiv ↗</a>
           <span class="paper-status active">Active</span>
         </div>
-        <div class="paper-title">PromptIntern: Internalizing Recurrent Prompts</div>
-        <div class="paper-desc">Absorbs frequently-used prompt fragments into the model weights via fine-tuning, eliminating re-tokenization overhead at inference.</div>
+        <div class="paper-title">Prompt Internalization <button type="button" class="paper-info-i" title="PromptIntern (2407.02211): Absorbs frequently-used prompt fragments into model weights via fine-tuning, eliminating re-tokenization overhead at inference time.">i</button></div>
+        <div class="paper-desc">Learns your most-used prompt patterns and bakes them into the model, eliminating repetitive processing overhead.</div>
         <div class="paper-controls">
           <div class="paper-info-box">Active for local HuggingFace models only. Set prompt_distillation_module_mode to <code>enabled</code> with a local_model backend.</div>
         </div>
@@ -1582,8 +1594,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2406.03482" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-qjl">Standby</span>
         </div>
-        <div class="paper-title">QJL: 1-Bit Quantized JL Transform for KV Cache</div>
-        <div class="paper-desc">Projects KV cache tensors with a 1-bit JL transform, achieving 4–8× KV memory reduction with zero-overhead attention computation.</div>
+        <div class="paper-title">Memory Compression <button type="button" class="paper-info-i" title="QJL (2406.03482): Uses 1-bit Johnson-Lindenstrauss transforms to compress KV cache tensors, achieving 4–8× memory reduction with zero-overhead attention computation.">i</button></div>
+        <div class="paper-desc">Compresses model memory usage by 4–8× using advanced quantization, enabling more concurrent requests with less hardware.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <select class="paper-codec-select" id="kv-codec-select" onchange="handleKvCodecChange(this.value)">
@@ -1607,8 +1619,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2502.02617" target="_blank">arXiv ↗</a>
           <span class="paper-status standby">Standby</span>
         </div>
-        <div class="paper-title">PolarQuant: Rotational-Symmetry Key Quantization</div>
-        <div class="paper-desc">Exploits rotational symmetry in key cache activations to quantize keys with minimal reconstruction error, preserving attention patterns.</div>
+        <div class="paper-title">Precision Quantization <button type="button" class="paper-info-i" title="PolarQuant (2502.02617): Exploits rotational symmetry in key cache activations to quantize with minimal error, preserving attention accuracy.">i</button></div>
+        <div class="paper-desc">High-fidelity memory compression that preserves attention accuracy while reducing hardware requirements.</div>
         <div class="paper-controls">
           <div class="paper-info-box">Select <strong>PolarQuant</strong> in the kv_codec selector above (Paper 8) to enable.</div>
         </div>
@@ -1622,8 +1634,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2504.19874" target="_blank">arXiv ↗</a>
           <span class="paper-status standby">Standby</span>
         </div>
-        <div class="paper-title">TurboQuant: Online Activation Compression</div>
-        <div class="paper-desc">Online quantization of KV activations at serving time with Triton/CUDA kernels, achieving near-lossless compression at 4 bits.</div>
+        <div class="paper-title">Turbo Compression <button type="button" class="paper-info-i" title="TurboQuant (2504.19874): Real-time quantization of KV activations during serving with Triton/CUDA kernels, achieving near-lossless compression at 4 bits.">i</button></div>
+        <div class="paper-desc">Real-time compression during inference for near-lossless quality at a fraction of the memory cost.</div>
         <div class="paper-controls">
           <div class="paper-info-box">Select <strong>TurboQuant</strong> in the kv_codec selector above (Paper 8) to enable.</div>
         </div>
@@ -1637,8 +1649,8 @@
           <a class="paper-arxiv" href="https://mlsys.org/" target="_blank">mlsys.org ↗</a>
           <span class="paper-status taxonomy">Taxonomy</span>
         </div>
-        <div class="paper-title">Rethinking KV Cache Compression (MLSys 2025 Survey)</div>
-        <div class="paper-desc">Unifying taxonomy for KV cache compression techniques across eviction, quantization, low-rank projection, and sparsity methods.</div>
+        <div class="paper-title">Compression Taxonomy <button type="button" class="paper-info-i" title="MLSys 2025 Survey: A unified taxonomy of KV cache compression techniques (eviction, quantization, projection, sparsity) that informs Byte's compression strategy.">i</button></div>
+        <div class="paper-desc">Reference framework that guides Byte's compression strategy across all quantization and eviction methods.</div>
         <div class="paper-controls">
           <div class="paper-info-box">Reference taxonomy only — no direct config toggle. Informs the design of QJL, PolarQuant, TurboQuant, and H2O implementations.</div>
         </div>
@@ -1651,8 +1663,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2306.14048" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-h2o">Standby</span>
         </div>
-        <div class="paper-title">H2O: Heavy-Hitter Oracle KV Eviction</div>
-        <div class="paper-desc">Evicts KV cache entries using an oracle that identifies heavy-hitter tokens, keeping only the top heavy + recent tokens.</div>
+        <div class="paper-title">Smart Eviction <button type="button" class="paper-info-i" title="H2O (Heavy-Hitter Oracle): Intelligently evicts cached entries by identifying the most important tokens, keeping only high-value and recent entries.">i</button></div>
+        <div class="paper-desc">Intelligently manages cache memory by keeping the most important entries and evicting low-value ones automatically.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-h2o" onchange="patchConfig('h2o_enabled', this.checked); document.getElementById('ps-h2o').textContent = this.checked ? 'Active' : 'Standby'; document.getElementById('ps-h2o').className = 'paper-status ' + (this.checked ? 'active' : 'standby')">
@@ -1679,8 +1691,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2601.11687" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-nl2code">Standby</span>
         </div>
-        <div class="paper-title">Semantic Caching &amp; Intent-Driven Context Optimization for NL2Code</div>
-        <div class="paper-desc">Three-part implementation: LLM-based equivalence detection, dual-threshold reference lane, and intent-driven context filtering (40–60% token reduction).</div>
+        <div class="paper-title">Intent-Aware Caching <button type="button" class="paper-info-i" title="NL2Code (2601.11687): Three-part system — LLM-based equivalence detection, dual-threshold reference mode, and intent-driven context filtering for 40–60% token reduction.">i</button></div>
+        <div class="paper-desc">Understands the intent behind each query to decide caching, filtering, and context selection — saving 40–60% of tokens.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-llm-equiv" onchange="patchConfig('llm_equivalence_enabled', this.checked)">
@@ -1717,11 +1729,9 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2406.18665" target="_blank">arXiv &#x2197;</a>
           <span class="paper-status standby" id="ps-route-llm">Standby</span>
         </div>
-        <div class="paper-title">RouteLLM: Learned Cheap/Strong Model Router</div>
+        <div class="paper-title">Smart Router <button type="button" class="paper-info-i" title="RouteLLM (2406.18665): A classifier scores each query and routes simple ones to a cheaper model while escalating complex ones to a stronger model — 2–3× cost reduction at equal quality.">i</button></div>
         <div class="paper-desc">
-          A small classifier scores each incoming query. Queries below the threshold are routed to the configured cheap model
-          (e.g.&nbsp;<code>gpt-4o-mini</code>); the rest are escalated to the strong model. Reported 2&ndash;3&times; cost reduction at
-          parity quality.
+          Automatically routes simple queries to cheaper models and complex ones to stronger models — saving 2–3× on costs with no quality loss.
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
@@ -1751,10 +1761,9 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2508.07675" target="_blank">arXiv &#x2197;</a>
           <span class="paper-status standby" id="ps-cost-evict">Standby</span>
         </div>
-        <div class="paper-title">Cost-Aware Semantic Cache Eviction</div>
+        <div class="paper-title">Cost-Aware Cache Management <button type="button" class="paper-info-i" title="Cost-Aware Eviction (2508.07675): Replaces basic LRU with a quality×recency weighted policy — keeps high-value entries longer and removes low-quality ones first.">i</button></div>
         <div class="paper-desc">
-          Replaces LRU with a mismatch-cost-weighted policy: entries with the lowest combined (quality&nbsp;score &times; recency
-          decay) are evicted first. Keeps high-value entries longer and reduces silent low-quality cache hits.
+          Keeps your most valuable cached responses longer and removes low-quality ones first — smarter than basic time-based eviction.
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
@@ -1781,11 +1790,9 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2503.05530" target="_blank">arXiv &#x2197;</a>
           <span class="paper-status standby" id="ps-lsh">Standby</span>
         </div>
-        <div class="paper-title">Proximity: LSH Approximate Cache Prefilter</div>
+        <div class="paper-title">Fast Cache Lookup <button type="button" class="paper-info-i" title="Proximity LSH (2503.05530): A MinHash-LSH prefilter that catches near-duplicate queries in near-O(1) time, skipping expensive embedding + vector search. Up to 77% fewer similarity lookups.">i</button></div>
         <div class="paper-desc">
-          A MinHash-LSH gate sits in front of the vector similarity search. Near-duplicate queries short-circuit in
-          near-O(1) time, skipping embedding + vector traversal. Up to 77% reduction in similarity-search calls on
-          skewed workloads.
+          Lightning-fast duplicate detection that catches repeated queries instantly, skipping expensive similarity searches — up to 77% faster lookups.
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">

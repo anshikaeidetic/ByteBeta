@@ -519,8 +519,8 @@ def test_init_safe_semantic_cache_raises_default_guard_rails(tmp_path) -> None:
         ),
     )
 
-    assert semantic_cache.config.similarity_threshold == 0.85
-    assert semantic_cache.config.semantic_min_token_overlap == 0.30
+    assert semantic_cache.config.similarity_threshold == 0.98
+    assert semantic_cache.config.semantic_min_token_overlap == 0.50
     assert semantic_cache.config.semantic_max_length_ratio == 3.0
     assert semantic_cache.config.semantic_enforce_canonical_match is True
     assert semantic_cache.config.cache_admission_min_score == 0.65

@@ -150,11 +150,10 @@ def _safe_semantic_config(config: Config | None) -> Config:
     # Empirically, 0.85-0.90 is the
     # sweet spot for general workloads — above 0.90 misses too many rephrased queries,
     # below 0.80 risks returning wrong answers for different questions.
-    if cfg.similarity_threshold < 0.85:
-        cfg.similarity_threshold = 0.85
-    # Token overlap 0.30 allows synonyms / minor reformulations to hit cache.
+    if cfg.similarity_threshold < 0.98:
+        cfg.similarity_threshold = 0.98
     if cfg.semantic_min_token_overlap <= 0:
-        cfg.semantic_min_token_overlap = 0.30
+        cfg.semantic_min_token_overlap = 0.50
     if cfg.semantic_max_length_ratio is None or cfg.semantic_max_length_ratio > 3.0:
         cfg.semantic_max_length_ratio = 3.0
     cfg.semantic_enforce_canonical_match = True

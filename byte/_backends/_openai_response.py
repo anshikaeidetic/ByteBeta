@@ -59,6 +59,7 @@ def _construct_stream_resp_from_cache(return_message, saved_token) -> list[Any]:
             "object": "chat.completion.chunk",
             "saved_token": saved_token,
         },
+        "[DONE]",
     ]
 
 

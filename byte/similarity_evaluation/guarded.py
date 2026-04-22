@@ -55,7 +55,7 @@ class GuardedSimilarityEvaluation(SimilarityEvaluation):
                 min(len(src_tokens), len(cache_tokens)),
                 1,
             )
-            if length_ratio > self._max_length_ratio:
+            if length_ratio >= self._max_length_ratio:
                 return min_rank
 
         if self._min_token_overlap > 0 and src_tokens and cache_tokens:
