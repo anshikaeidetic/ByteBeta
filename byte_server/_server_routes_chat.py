@@ -246,7 +246,14 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                         cache_hit=None,
                         model_name=model_name,
                     )
-                return StreamingResponse(generate(), media_type="text/event-stream")
+                return StreamingResponse(
+                    generate(),
+                    media_type="text/event-stream",
+                    headers={
+                        "X-Accel-Buffering": "no",
+                        "Cache-Control": "no-cache, no-transform",
+                    },
+                )
 
             started_at = time.perf_counter()
             if worker_selection is not None and control_plane is not None and scope is not None:
