@@ -47,7 +47,7 @@ cachecontrol==0.14.4
     #   pip-audit
 cachetools==7.0.5
     # via byteai-cache (pyproject.toml)
-certifi==2026.2.25
+certifi==2026.4.22
     # via
     #   httpcore
     #   httpx
