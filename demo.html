@@ -2706,10 +2706,8 @@ function _scheduleModelFetch() {
   if (detected && detected !== _lastDetectedProvider) {
     _lastDetectedProvider = detected;
     const sel = $('provider');
-    if (sel.value !== detected) {
-      sel.value = detected;
-      sel.dispatchEvent(new Event('change', { bubbles: true }));
-    }
+    sel.value = detected;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
   }
   clearTimeout(_modelFetchTimer);
   _modelFetchTimer = setTimeout(() => {

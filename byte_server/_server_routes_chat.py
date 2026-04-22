@@ -190,6 +190,10 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                 async def generate() -> Any:
                     queue: asyncio.Queue = asyncio.Queue()
                     _sentinel = object()
+                    _loop = asyncio.get_event_loop()
+
+                    def _enqueue(item: object) -> None:
+                        _loop.call_soon_threadsafe(queue.put_nowait, item)
 
                     def _produce() -> None:
                         try:
@@ -213,8 +217,8 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                                 if stream_response == "[DONE]":
                                     frame = _maybe_empty_hit_frame()
                                     if frame:
-                                        queue.put_nowait(frame)
-                                    queue.put_nowait("data: [DONE]\n\n")
+                                        _enqueue(frame)
+                                    _enqueue("data: [DONE]\n\n")
                                     return
                                 if isinstance(stream_response, dict):
                                     if stream_response.get("byte") is True:
@@ -223,18 +227,18 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                                     if _choices:
                                         _delta_content = (_choices[0].get("delta") or {}).get("content") or ""
                                         _content_buf.append(_delta_content)
-                                queue.put_nowait(f"data: {json.dumps(stream_response)}\n\n")
+                                _enqueue(f"data: {json.dumps(stream_response)}\n\n")
                             frame = _maybe_empty_hit_frame()
                             if frame:
-                                queue.put_nowait(frame)
-                            queue.put_nowait("data: [DONE]\n\n")
+                                _enqueue(frame)
+                            _enqueue("data: [DONE]\n\n")
                         except Exception as stream_exc:
-                            queue.put_nowait(f"data: {json.dumps({'error': {'message': str(stream_exc), 'type': 'stream_error'}})}\n\n")
-                            queue.put_nowait("data: [DONE]\n\n")
+                            _enqueue(f"data: {json.dumps({'error': {'message': str(stream_exc), 'type': 'stream_error'}})}\n\n")
+                            _enqueue("data: [DONE]\n\n")
                         finally:
-                            queue.put_nowait(_sentinel)
+                            _enqueue(_sentinel)
 
-                    asyncio.get_event_loop().run_in_executor(None, _produce)
+                    _loop.run_in_executor(None, _produce)
 
                     while True:
                         item = await queue.get()
