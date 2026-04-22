@@ -278,7 +278,7 @@ opentelemetry-exporter-otlp-proto-common==1.37.0
     #   opentelemetry-exporter-otlp-proto-http
 opentelemetry-exporter-otlp-proto-grpc==1.37.0
     # via byteai-cache (pyproject.toml)
-opentelemetry-exporter-otlp-proto-http==1.37.0
+opentelemetry-exporter-otlp-proto-http==1.41.0
     # via byteai-cache (pyproject.toml)
 opentelemetry-proto==1.37.0
     # via
