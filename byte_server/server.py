@@ -228,24 +228,7 @@ def _register_app_components() -> None:
     register_mcp_routes(app, services)
     register_control_routes(app, services)
     register_config_routes(app, services)
-    _register_demo_route()
     _APP_CONFIGURED = True
-
-
-def _register_demo_route() -> None:
-    import pathlib
-
-    from starlette.responses import FileResponse, JSONResponse
-
-    _demo = pathlib.Path(__file__).parent.parent / "demo.html"
-
-    @app.get("/", include_in_schema=False)
-    @app.get("/demo", include_in_schema=False)
-    @app.get("/demo.html", include_in_schema=False)
-    async def _serve_demo() -> FileResponse | JSONResponse:
-        if _demo.exists():
-            return FileResponse(str(_demo), media_type="text/html")
-        return JSONResponse({"status": "ok", "service": "Byte Gateway"})
 
 
 def _security_config_kwargs(args: Any, allowed_egress_hosts: list[str]) -> dict[str, Any]:

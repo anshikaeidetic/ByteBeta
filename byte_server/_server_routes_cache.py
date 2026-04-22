@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 
 from byte import PRODUCT_SHORT_NAME, __version__
 from byte.adapter.api import (
@@ -46,9 +46,20 @@ from byte_server.models import (
 
 
 def register_cache_routes(app: FastAPI, services: ServerServices) -> None:
-    @app.get("/")
-    async def hello() -> str:
-        return "hello byteai cache server"
+    _demo_path = Path(os.environ.get("BYTE_DEMO_PATH", "") or "demo.html")
+    if not _demo_path.is_absolute():
+        _demo_path = Path.cwd() / _demo_path
+
+    @app.get("/", include_in_schema=False)
+    @app.get("/demo", include_in_schema=False)
+    @app.get("/demo.html", include_in_schema=False)
+    async def root() -> Response:
+        if _demo_path.is_file():
+            return FileResponse(str(_demo_path), media_type="text/html")
+        return Response(
+            content=f"{PRODUCT_SHORT_NAME} v{__version__} — gateway is running",
+            media_type="text/plain",
+        )
 
     @app.get("/healthz")
     async def healthz() -> dict:
