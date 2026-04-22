@@ -213,7 +213,7 @@ class _CacheLifecycleMixin:
 
     def _maybe_apply_cost_aware_eviction(self, config: Any) -> None:
         """Swap the data manager's eviction policy in-place when the config asks for
-        COST_AWARE (arXiv 2508.07675). The existing MemoryCacheEviction already
+        COST_AWARE . The existing MemoryCacheEviction already
         delegates to CostAwareCacheEviction under the same class, so we just need
         to re-instantiate it with the new policy name and replace the reference.
         """
@@ -246,7 +246,7 @@ class _CacheLifecycleMixin:
             except Exception:  # pragma: no cover - defensive
                 pass
             dm.eviction_base = new_base
-            byte_log.info("Cost-aware eviction policy activated (arXiv 2508.07675)")
+            byte_log.info("Cost-aware eviction policy activated ")
         except Exception as exc:  # pragma: no cover - defensive
             byte_log.warning("Failed to apply COST_AWARE eviction: %s", exc)
 

@@ -1,22 +1,18 @@
-"""RouteLLM-style learned router for cheap-vs-strong model selection.
+"""Byte Smart Router — multi-signal complexity analysis for model tier selection.
 
-Based on arXiv 2406.18665 ("RouteLLM: Learning to Route LLMs with Preference Data",
-Ong et al., ICLR 2025). The paper's central idea is a small classifier that
-emits a routing score in [0, 1]; queries scoring below a tunable threshold are
-served by the cheap model, the remainder are escalated to the strong model.
-Reported cost reductions of 2–3× at equivalent quality on MT-Bench, MMLU,
-and GSM8K.
+Per-query cheap/strong classifier that emits a routing score in [0, 1];
+queries scoring below a tunable threshold are served by the cheap tier, the
+rest are escalated to the strong tier.
 
 This module provides:
 
-1. `RouteLLMScorer` — a no-dependency heuristic scorer that extracts features
+1. `ByteRouterScorer` — a no-dependency heuristic scorer that extracts features
    (length, reasoning/code/math markers, token counts) and composes them into
    a routing score. Works out of the box with no training data.
 
 2. Optional KNN mode — when the operator provides a JSON file of labelled
    (query, label) examples, the scorer embeds the incoming query and votes
-   among the k-nearest labelled neighbours. This mirrors the "similarity-
-   weighted KNN router" variant in Ong et al.
+   among the k-nearest labelled neighbours.
 
 3. `route_decision()` — returns the selected model, score, and a rationale
    suitable for audit/metric emission.
@@ -142,10 +138,10 @@ class _KNNSample:
 class _KNNScorer:
     """k-nearest-neighbour scorer over a labelled seed dataset.
 
-    Loaded lazily from a JSON file specified via `RouteLLMScorer(seed_path=...)`.
+    Loaded lazily from a JSON file specified via `ByteRouterScorer(seed_path=...)`.
     Each entry in the file must have the shape:
         {"query": "<text>", "label": 0 or 1, "embedding": [...]}
-    If embeddings are absent, set the `embedding_fn` on RouteLLMScorer and this
+    If embeddings are absent, set the `embedding_fn` on ByteRouterScorer and this
     class will compute them on load.
     """
 
@@ -182,11 +178,11 @@ class _KNNScorer:
 
 
 _SCORER_LOCK = threading.Lock()
-_SCORER_CACHE: dict[str, RouteLLMScorer] = {}
+_SCORER_CACHE: dict[str, ByteRouterScorer] = {}
 
 
 @dataclass
-class RouteLLMDecision:
+class ByteRouterDecision:
     selected_model: str
     score: float
     tier: str                  # "cheap" | "strong"
@@ -194,8 +190,8 @@ class RouteLLMDecision:
     signals: list[str]
 
 
-class RouteLLMScorer:
-    """Per-query cheap/strong classifier (arXiv 2406.18665)."""
+class ByteRouterScorer:
+    """Per-query cheap/strong classifier for tier selection."""
 
     def __init__(
         self,
@@ -218,7 +214,7 @@ class RouteLLMScorer:
             with open(self._seed_path, encoding="utf-8") as fh:
                 raw = json.load(fh)
         except Exception as exc:  # pylint: disable=W0703
-            byte_log.warning("RouteLLM seed load failed (%s): %s", self._seed_path, exc)
+            byte_log.warning("Byte Router seed load failed (%s): %s", self._seed_path, exc)
             return
 
         samples: list[_KNNSample] = []
@@ -254,7 +250,7 @@ class RouteLLMScorer:
                 combined = 0.6 * heuristic + 0.4 * knn_score
                 return combined, heur_signals + knn_signals
             except Exception as exc:  # pylint: disable=W0703
-                byte_log.debug("RouteLLM KNN inference failed, falling back to heuristic: %s", exc)
+                byte_log.debug("Byte Router KNN inference failed, falling back to heuristic: %s", exc)
         return heuristic, heur_signals
 
     # ── full decision ──
@@ -265,30 +261,30 @@ class RouteLLMScorer:
         cheap_model: str,
         strong_model: str,
         default_model: str = "",
-    ) -> RouteLLMDecision:
+    ) -> ByteRouterDecision:
         score, signals = self.score(query)
         if score < self.threshold and cheap_model:
-            return RouteLLMDecision(
+            return ByteRouterDecision(
                 selected_model=cheap_model,
                 score=score,
                 tier="cheap",
-                reason=f"RouteLLM: score {score:.3f} < threshold {self.threshold:.3f}",
+                reason=f"Byte Router: score {score:.3f} < threshold {self.threshold:.3f}",
                 signals=signals,
             )
         if score >= self.threshold and strong_model:
-            return RouteLLMDecision(
+            return ByteRouterDecision(
                 selected_model=strong_model,
                 score=score,
                 tier="strong",
-                reason=f"RouteLLM: score {score:.3f} >= threshold {self.threshold:.3f}",
+                reason=f"Byte Router: score {score:.3f} >= threshold {self.threshold:.3f}",
                 signals=signals,
             )
         # Either cheap or strong not configured — fall through.
-        return RouteLLMDecision(
+        return ByteRouterDecision(
             selected_model=default_model or strong_model or cheap_model,
             score=score,
             tier="cheap" if score < self.threshold else "strong",
-            reason="RouteLLM: cheap/strong not configured, falling back",
+            reason="Byte Router: cheap/strong not configured, falling back",
             signals=signals,
         )
 
@@ -300,13 +296,13 @@ def _get_scorer(
     threshold: float,
     seed_path: str,
     embedding_fn: Callable[[str], list[float]] | None,
-) -> RouteLLMScorer:
+) -> ByteRouterScorer:
     """Memoised scorer keyed by (threshold, seed_path) — avoids reloading seeds on every request."""
     key = f"{threshold:.4f}|{seed_path}"
     with _SCORER_LOCK:
         scorer = _SCORER_CACHE.get(key)
         if scorer is None:
-            scorer = RouteLLMScorer(
+            scorer = ByteRouterScorer(
                 threshold=threshold,
                 seed_path=seed_path or None,
                 embedding_fn=embedding_fn,
@@ -324,7 +320,7 @@ def route_decision(
     seed_path: str = "",
     embedding_fn: Callable[[str], list[float]] | None = None,
     default_model: str = "",
-) -> RouteLLMDecision:
+) -> ByteRouterDecision:
     """Convenience entry point for pipeline hooks."""
     scorer = _get_scorer(threshold, seed_path, embedding_fn)
     return scorer.decide(
@@ -342,8 +338,8 @@ def reset_scorer_cache() -> None:
 
 
 __all__ = [
-    "RouteLLMDecision",
-    "RouteLLMScorer",
+    "ByteRouterDecision",
+    "ByteRouterScorer",
     "reset_scorer_cache",
     "route_decision",
 ]

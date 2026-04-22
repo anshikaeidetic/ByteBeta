@@ -35,15 +35,15 @@ _RESEARCH_STATS: dict[str, float] = {
     "recomp_augmentation_hits":      0,
     "prompt_distillation_calls":     0,
     "prompt_distillation_tokens_saved": 0,
-    # RouteLLM (arXiv 2406.18665)
+    # Byte Router 
     "route_llm_total":               0,
     "route_llm_cheap":               0,
     "route_llm_strong":              0,
     "route_llm_skipped_cross_provider": 0,
-    # Cost-Aware Eviction (arXiv 2508.07675)
+    # Cost-Aware Eviction 
     "eviction_cost_aware_evictions": 0,
     "eviction_cost_aware_savings":   0,
-    # LSH Prefilter (arXiv 2503.05530)
+    # LSH Prefilter 
     "lsh_prefilter_lookups":         0,
     "lsh_prefilter_tier0_hits":      0,
     "lsh_prefilter_skipped_searches": 0,
@@ -151,33 +151,33 @@ class LibraryCacheObserver:
             description="Total cache hits observed by the ByteAI library runtime.",
         )
         # New research-paper metrics ─────────────────────────────────────────
-        # arXiv 2601.11687 — Dual-threshold reference lane
+        #  — Dual-threshold reference lane
         self._dual_threshold_reference_hits = meter.create_counter(
             "byteai.dual_threshold.reference_hits",
-            description="Stage 2 reference-lane activations (arXiv 2601.11687).",
+            description="Stage 2 reference-lane activations .",
         )
-        # arXiv 2601.11687 — Intent-driven context filter
+        #  — Intent-driven context filter
         self._intent_context_tokens_saved = meter.create_counter(
             "byteai.intent_context.tokens_saved",
-            description="Cumulative tokens removed by IntentDrivenContextFilter (arXiv 2601.11687).",
+            description="Cumulative tokens removed by IntentDrivenContextFilter .",
         )
-        # arXiv 2601.11687 — LLM equivalence checker
+        #  — LLM equivalence checker
         self._llm_equivalence_calls = meter.create_counter(
             "byteai.llm_equivalence.calls",
-            description="LLM equivalence checker invocations (arXiv 2601.11687).",
+            description="LLM equivalence checker invocations .",
         )
-        # arXiv 2502.03771 — vCache
+        #  — vCache
         self._vcache_threshold_updates = meter.create_counter(
             "byteai.vcache.threshold_updates",
-            description="Online sigmoid parameter updates received by vCache (arXiv 2502.03771).",
+            description="Online sigmoid parameter updates received by vCache .",
         )
         self._vcache_error_rate = meter.create_gauge(
             "byteai.vcache.error_rate",
-            description="Rolling empirical error rate for vCache (arXiv 2502.03771).",
+            description="Rolling empirical error rate for vCache .",
         )
         self._vcache_cold_embeddings = meter.create_gauge(
             "byteai.vcache.cold_embeddings",
-            description="Count of embeddings below min_observations in vCache (arXiv 2502.03771).",
+            description="Count of embeddings below min_observations in vCache .",
         )
 
     def record_operation(self, operation: str, delta_time: float) -> None:

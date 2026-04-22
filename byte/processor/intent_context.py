@@ -1,6 +1,6 @@
 """Intent-driven context filtering for token-efficient prompt assembly.
 
-Implements arXiv 2601.11687 (Harmohit Singh, January 2026, "Semantic Caching
+Implements  (Harmohit Singh, January 2026, "Semantic Caching
 and Intent-Driven Context Optimization for Multi-Agent Natural Language to
 Code Systems"). Reduces context window token consumption 40-60% by filtering
 to intent-relevant schema elements and document chunks.
@@ -139,7 +139,7 @@ def filter_context(
 
 
 class IntentDrivenContextFilter:
-    """Intent-driven context pruning (arXiv 2601.11687).
+    """Intent-driven context pruning .
 
     Classifies incoming query intent (lookup/aggregation/join/comparison/generation)
     and filters the context window to only include schema elements, tool definitions,

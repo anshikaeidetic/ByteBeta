@@ -273,7 +273,7 @@ def _build_run_state(
 
 
 def _apply_intent_filter_if_enabled(state: PipelineRunState) -> None:
-    """Apply IntentDrivenContextFilter when intent_context_filtering_enabled=True (arXiv 2601.11687)."""
+    """Apply IntentDrivenContextFilter when intent_context_filtering_enabled=True ."""
     cfg = getattr(state.chat_cache, "config", None)
     if cfg is None or not getattr(cfg, "intent_context_filtering_enabled", False):
         return

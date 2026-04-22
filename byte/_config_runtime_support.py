@@ -189,13 +189,13 @@ def finalize_config(config: Any) -> None:
         }
     cfg.routing_verifier_enabled = bool(cfg.routing_verifier_enabled or cfg.routing_verifier_model)
 
-    # Deprecation shim: map legacy TrustConfig fields to vCache equivalents (arXiv 2502.03771)
+    # Deprecation shim: map legacy TrustConfig fields to vCache equivalents 
     _default_reuse_band = "adaptive"
     _default_novelty = 0.62
     if cfg.reuse_band_policy != _default_reuse_band:
         warnings.warn(
             "TrustConfig.reuse_band_policy is deprecated. Use CacheConfig.vcache_enabled instead "
-            "(vCache, arXiv 2502.03771). The old field will be removed in a future release.",
+            "(vCache, ). The old field will be removed in a future release.",
             DeprecationWarning,
             stacklevel=4,
         )
@@ -204,7 +204,7 @@ def finalize_config(config: Any) -> None:
     if cfg.novelty_threshold != _default_novelty:
         warnings.warn(
             "TrustConfig.novelty_threshold is deprecated. Use CacheConfig.vcache_delta instead "
-            "(vCache, arXiv 2502.03771). The old field will be removed in a future release.",
+            "(vCache, ). The old field will be removed in a future release.",
             DeprecationWarning,
             stacklevel=4,
         )

@@ -13,24 +13,27 @@ from byte_server._server_security import _audit_event, _raise_route_error, _requ
 from byte_server._server_state import ServerServices
 from byte_server.models import ControlPlaneSettingsUpdate
 
-# Metadata for all 14 implemented research papers
+# Metadata for Byte-native features exposed via /features endpoint.
 _PAPERS_REGISTRY = [
-    {"id": "2311.04934", "title": "Prompt Cache: Modular Attention Reuse for Low-Latency Inference", "arxiv_url": "https://arxiv.org/abs/2311.04934", "config_toggle": "prompt_module_mode", "status": "implemented"},
-    {"id": "2310.06839", "title": "LongLLMLingua: Accelerating and Enhancing LLMs in Long Context via Prompt Compression", "arxiv_url": "https://arxiv.org/abs/2310.06839", "config_toggle": "prompt_distillation_mode", "status": "implemented"},
-    {"id": "2403.12968", "title": "LLMLingua-2: Data Distillation for Efficient and Faithful Task-Agnostic Prompt Compression", "arxiv_url": "https://arxiv.org/abs/2403.12968", "config_toggle": "prompt_distillation_backend", "status": "implemented"},
-    {"id": "2310.06201", "title": "Compressing Context to Enhance Inference Efficiency of Large Language Models", "arxiv_url": "https://arxiv.org/abs/2310.06201", "config_toggle": "context_compiler", "status": "implemented"},
-    {"id": "2310.04408", "title": "RECOMP: Improving Retrieval-Augmented LMs with Context Compression and Selective Augmentation", "arxiv_url": "https://arxiv.org/abs/2310.04408", "config_toggle": "context_compiler", "status": "implemented"},
-    {"id": "2502.03771", "title": "vCache: Verified Semantic Prompt Caching", "arxiv_url": "https://arxiv.org/abs/2502.03771", "config_toggle": "vcache_enabled", "status": "implemented"},
-    {"id": "2407.02211", "title": "PromptIntern: Saving Inference Costs by Internalizing Recurrent Prompt during Large Language Model Fine-tuning", "arxiv_url": "https://arxiv.org/abs/2407.02211", "config_toggle": "prompt_distillation_module_mode", "status": "implemented"},
-    {"id": "2406.03482", "title": "QJL: 1-Bit Quantized JL Transform for KV Cache Quantization with Zero Overhead", "arxiv_url": "https://arxiv.org/abs/2406.03482", "config_toggle": "kv_codec", "status": "implemented"},
-    {"id": "2502.02617", "title": "PolarQuant: Leveraging Rotational Symmetry for Efficient Key Cache Quantization", "arxiv_url": "https://arxiv.org/abs/2502.02617", "config_toggle": "kv_codec", "status": "implemented"},
-    {"id": "2504.19874", "title": "TurboQuant: Online Activation Compression for LLM Serving", "arxiv_url": "https://arxiv.org/abs/2504.19874", "config_toggle": "kv_codec", "status": "implemented"},
-    {"id": "MLSys-2025-survey", "title": "Rethinking KV Cache Compression for Efficient LLM Serving (MLSys 2025 Survey)", "arxiv_url": "https://mlsys.org/", "config_toggle": None, "status": "taxonomy"},
-    {"id": "H2O-eviction", "title": "H2O: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models", "arxiv_url": "https://arxiv.org/abs/2306.14048", "config_toggle": "h2o_enabled", "status": "implemented"},
-    {"id": "2601.11687", "title": "Semantic Caching and Intent-Driven Context Optimization for Multi-Agent Natural Language to Code Systems", "arxiv_url": "https://arxiv.org/abs/2601.11687", "config_toggle": "dual_threshold_reference_mode", "status": "implemented"},
-    {"id": "2406.18665", "title": "RouteLLM: Learning to Route LLMs with Preference Data (ICLR 2025)", "arxiv_url": "https://arxiv.org/abs/2406.18665", "config_toggle": "route_llm_enabled", "status": "implemented"},
-    {"id": "2508.07675", "title": "Semantic Caching for Low-Cost LLM Serving: Cost-Aware Eviction", "arxiv_url": "https://arxiv.org/abs/2508.07675", "config_toggle": "eviction_policy", "status": "implemented"},
-    {"id": "2503.05530", "title": "Proximity: LSH Approximate Cache Prefilter", "arxiv_url": "https://arxiv.org/abs/2503.05530", "config_toggle": "lsh_prefilter_enabled", "status": "implemented"},
+    {"id": "byte-prompt-cache",       "title": "Byte Prompt Cache — modular prompt-module reuse for low-latency inference",               "config_toggle": "prompt_module_mode",                 "status": "implemented"},
+    {"id": "byte-prompt-distill",     "title": "Byte Prompt Distillation — long-context compression with faithfulness verification",       "config_toggle": "prompt_distillation_mode",           "status": "implemented"},
+    {"id": "byte-distill-core",       "title": "Byte Distillation Core — task-agnostic token-level compression",                            "config_toggle": "prompt_distillation_backend",        "status": "implemented"},
+    {"id": "byte-context-compiler",   "title": "Byte Context Compiler — adaptive context budgeting",                                        "config_toggle": "context_compiler",                   "status": "implemented"},
+    {"id": "byte-retrieval-compress", "title": "Byte Retrieval Compression — RAG context pruning with selective augmentation",              "config_toggle": "context_compiler",                   "status": "implemented"},
+    {"id": "byte-vcache",             "title": "Byte vCache — per-prompt verified semantic caching",                                        "config_toggle": "vcache_enabled",                     "status": "implemented"},
+    {"id": "byte-prompt-intern",      "title": "Byte Prompt Intern — recurrent-prompt internalization",                                     "config_toggle": "prompt_distillation_module_mode",    "status": "implemented"},
+    {"id": "byte-kv-qjl",             "title": "Byte KV Codec (QJL) — 1-bit quantized JL transform for KV cache",                           "config_toggle": "kv_codec",                           "status": "implemented"},
+    {"id": "byte-kv-polar",           "title": "Byte KV Codec (Polar) — rotational-symmetry key-cache quantization",                        "config_toggle": "kv_codec",                           "status": "implemented"},
+    {"id": "byte-kv-turbo",           "title": "Byte KV Codec (Turbo) — online activation compression",                                     "config_toggle": "kv_codec",                           "status": "implemented"},
+    {"id": "byte-kv-taxonomy",        "title": "Byte KV Codec Taxonomy — pluggable compression backends",                                   "config_toggle": None,                                 "status": "taxonomy"},
+    {"id": "byte-h2o-eviction",       "title": "Byte H2O Eviction — heavy-hitter oracle for generative inference",                          "config_toggle": "h2o_enabled",                        "status": "implemented"},
+    {"id": "byte-intent-context",     "title": "Byte Intent Context Filter — dual-threshold reference lane for ambiguous hits",             "config_toggle": "dual_threshold_reference_mode",      "status": "implemented"},
+    {"id": "byte-smart-router",       "title": "Byte Smart Router — multi-signal complexity analysis for cheap/strong tier selection",     "config_toggle": "route_llm_enabled",                  "status": "implemented"},
+    {"id": "byte-cost-eviction",      "title": "Byte Cost-Aware Eviction — value-weighted cache eviction",                                  "config_toggle": "eviction_policy",                    "status": "implemented"},
+    {"id": "byte-lsh-prefilter",      "title": "Byte LSH Prefilter — near-duplicate MinHash prefilter before vector search",                "config_toggle": "lsh_prefilter_enabled",              "status": "implemented"},
+    {"id": "byte-cascade",            "title": "Byte Cascade — confidence-gated escalation and stale-entry auto-invalidation",              "config_toggle": "cascade_escalation_enabled",         "status": "implemented"},
+    {"id": "byte-reasoning-reuse",    "title": "Byte Reasoning Reuse — deterministic shortcut engine and verified-memory lookup",          "config_toggle": "reasoning_reuse",                    "status": "implemented"},
+    {"id": "byte-quality-guard",      "title": "Byte Quality Guard — multi-signal response scoring and admission gate",                    "config_toggle": "response_repair",                    "status": "implemented"},
 ]
 
 
@@ -61,9 +64,9 @@ _PRESETS: dict[str, dict] = {
         "cache_latency_guard": True,
         "budget_strategy": "balanced",
         "llm_equivalence_enabled": False, "h2o_enabled": False, "kv_codec": "disabled",
-        # RouteLLM (arXiv 2406.18665) — cheap/strong router with a balanced 0.5 threshold
+        # Byte Router  — cheap/strong router with a balanced 0.5 threshold
         "route_llm_enabled": True, "route_llm_threshold": 0.5,
-        # LSH prefilter (arXiv 2503.05530)
+        # LSH prefilter 
         "lsh_prefilter_enabled": True, "lsh_num_perm": 128, "lsh_threshold": 0.6,
         # LRU stays for Balanced — cost-aware eviction only kicks in for Savings/Accuracy
         "eviction_policy": "LRU",
@@ -79,7 +82,7 @@ _PRESETS: dict[str, dict] = {
         "cache_latency_guard": True,
         "budget_strategy": "lowest_cost",
         "llm_equivalence_enabled": False, "h2o_enabled": False, "kv_codec": "disabled",
-        # RouteLLM — aggressive cheap routing with a low threshold
+        # Byte Router — aggressive cheap routing with a low threshold
         "route_llm_enabled": True, "route_llm_threshold": 0.35,
         # Cost-aware eviction keeps the highest-value entries longer
         "eviction_policy": "COST_AWARE",
@@ -98,7 +101,7 @@ _PRESETS: dict[str, dict] = {
         "budget_strategy": "quality_first",
         "evidence_verification": True,
         "h2o_enabled": False, "kv_codec": "disabled",
-        # RouteLLM — conservative threshold keeps more queries on the strong model
+        # Byte Router — conservative threshold keeps more queries on the strong model
         "route_llm_enabled": True, "route_llm_threshold": 0.65,
         # Cost-aware eviction + strict LSH (only clear near-duplicates short-circuit)
         "eviction_policy": "COST_AWARE",
@@ -258,7 +261,11 @@ def register_config_routes(app: FastAPI, services: ServerServices) -> None:
 
     @app.get("/papers")
     async def get_papers(request: Request) -> Any:
-        return JSONResponse(content={"papers": _PAPERS_REGISTRY, "total": len(_PAPERS_REGISTRY)})
+        return JSONResponse(content={"features": _PAPERS_REGISTRY, "total": len(_PAPERS_REGISTRY)})
+
+    @app.get("/features")
+    async def get_features(request: Request) -> Any:
+        return JSONResponse(content={"features": _PAPERS_REGISTRY, "total": len(_PAPERS_REGISTRY)})
 
     @app.delete("/cache/entry")
     async def delete_cache_entry(request: Request) -> Any:

@@ -130,14 +130,14 @@ def _prometheus_metrics_payload(services: ServerServices) -> str:
         f"byteai_recomp_augmentation_hits_total {int(research.get('recomp_augmentation_hits', 0) or 0)}",
         f"byteai_prompt_distillation_calls_total {int(research.get('prompt_distillation_calls', 0) or 0)}",
         f"byteai_prompt_distillation_tokens_saved_total {int(research.get('prompt_distillation_tokens_saved', 0) or 0)}",
-        # RouteLLM (arXiv 2406.18665)
+        # Byte Router 
         f"byteai_route_llm_decisions_total {int(research.get('route_llm_total', 0) or 0)}",
         f"byteai_route_llm_cheap_selections_total {int(research.get('route_llm_cheap', 0) or 0)}",
         f"byteai_route_llm_strong_selections_total {int(research.get('route_llm_strong', 0) or 0)}",
-        # Cost-Aware Eviction (arXiv 2508.07675)
+        # Cost-Aware Eviction 
         f"byteai_eviction_cost_aware_evictions_total {int(research.get('eviction_cost_aware_evictions', 0) or 0)}",
         f"byteai_eviction_cost_aware_savings_total {int(research.get('eviction_cost_aware_savings', 0) or 0)}",
-        # LSH Prefilter (arXiv 2503.05530)
+        # LSH Prefilter 
         f"byteai_lsh_prefilter_lookups_total {int(research.get('lsh_prefilter_lookups', 0) or 0)}",
         f"byteai_lsh_prefilter_tier0_hits_total {int(research.get('lsh_prefilter_tier0_hits', 0) or 0)}",
         f"byteai_lsh_prefilter_skipped_searches_total {int(research.get('lsh_prefilter_skipped_searches', 0) or 0)}",

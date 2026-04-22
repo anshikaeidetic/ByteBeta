@@ -1,4 +1,4 @@
-"""VCache per-prompt learned sigmoid decision boundary (arXiv 2502.03771).
+"""VCache per-prompt learned sigmoid decision boundary .
 
 UC Berkeley Sky Computing Lab. Enforces a user-defined maximum error rate δ
 with formal guarantees via online logistic regression. Each cached embedding
@@ -109,7 +109,7 @@ def _online_update(params: _VCacheParams, similarity: float, was_correct: bool, 
 
 
 class VCacheEvaluation(SimilarityEvaluation):
-    """Per-prompt learned sigmoid decision boundary (vCache, arXiv 2502.03771,
+    """Per-prompt learned sigmoid decision boundary (vCache, ,
     UC Berkeley Sky Computing Lab).
 
     Replaces the global static similarity threshold with a per-prompt learned

@@ -42,7 +42,7 @@ class MemoryCacheEviction(EvictionBase):
         **kwargs,
     ) -> None:
         self._policy = policy.upper()
-        # COST_AWARE (arXiv 2508.07675) — delegates to CostAwareCacheEviction.
+        # COST_AWARE  — delegates to CostAwareCacheEviction.
         if self._policy in ("COST_AWARE", "COST-AWARE"):
             from byte.manager.eviction.cost_aware import CostAwareCacheEviction
             self._delegate = CostAwareCacheEviction(

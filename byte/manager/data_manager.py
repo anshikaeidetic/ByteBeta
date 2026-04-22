@@ -207,7 +207,7 @@ class MapDataManager(DataManager):
                 session_id,
                 datetime.now(),
             )
-        # LSH prefilter (arXiv 2503.05530): index the stored question for future near-dup probes.
+        # LSH prefilter : index the stored question for future near-dup probes.
         try:
             from byte.manager.lsh_prefilter import (
                 get_lsh_prefilter,  # pylint: disable=import-outside-toplevel
@@ -255,7 +255,7 @@ class MapDataManager(DataManager):
         return None
 
     def search(self, embedding_data, **kwargs) -> list[Any]:
-        # LSH prefilter (arXiv 2503.05530): probe LSH when the caller provides text.
+        # LSH prefilter : probe LSH when the caller provides text.
         text = kwargs.pop("question_text", "") or ""
         if text:
             try:
@@ -450,7 +450,7 @@ class SSDataManager(DataManager):
             ]
         )
         self.eviction_base.put(ids)
-        # LSH prefilter (arXiv 2503.05530): index each new entry so future
+        # LSH prefilter : index each new entry so future
         # lookups can short-circuit near-duplicate queries in O(1).
         try:
             from byte.manager.lsh_prefilter import (
@@ -500,7 +500,7 @@ class SSDataManager(DataManager):
         self.eviction_base.get(res_data[1])
 
     def search(self, embedding_data, **kwargs) -> Any:
-        # LSH prefilter (arXiv 2503.05530): probe LSH for near-duplicates first.
+        # LSH prefilter : probe LSH for near-duplicates first.
         text = kwargs.pop("question_text", "") or ""
         lsh_candidates: list[Any] = []
         if text:

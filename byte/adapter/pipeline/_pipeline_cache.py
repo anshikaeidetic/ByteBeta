@@ -68,7 +68,7 @@ def lookup_cache_sync(state: PipelineRunState) -> Any:
 
     if not (state.cache_enable and not state.cache_skip):
         return NO_RESULT
-    # Pass the raw query text so the LSH prefilter (arXiv 2503.05530) can probe
+    # Pass the raw query text so the LSH prefilter  can probe
     # for near-duplicates before the full vector search.
     _lsh_text = str(state.pre_embedding_data or "") if isinstance(state.pre_embedding_data, str) else ""
     search_data_list = time_cal(
@@ -140,7 +140,7 @@ def _rank_cache_answers_sync(
     min_rank, max_rank = state.chat_cache.similarity_evaluation.range()
     rank_threshold = _rank_threshold(min_rank, max_rank, similarity_threshold, state.cache_factor)
 
-    # Dual-threshold reference lane bounds (arXiv 2601.11687)
+    # Dual-threshold reference lane bounds 
     dual_mode = getattr(cfg, "dual_threshold_reference_mode", False)
     band_low = getattr(cfg, "llm_equivalence_ambiguity_band_low", 0.70)
     band_high = getattr(cfg, "llm_equivalence_ambiguity_band_high", 0.85)
@@ -177,6 +177,7 @@ def _rank_cache_answers_sync(
             answer_text = cache_data.answers[0].answer if cache_data.answers else None
             if not answer_text or not str(answer_text).strip():
                 byte_log.debug("skip empty cache entry (sync, rank=%.3f)", rank)
+                state.context["_byte_cascade_invalidated"] = True
                 try:
                     q = cache_data.question
                     q_text = q.content if hasattr(q, "content") else q
@@ -226,7 +227,7 @@ async def _rank_cache_answers_async(
     min_rank, max_rank = state.chat_cache.similarity_evaluation.range()
     rank_threshold = _rank_threshold(min_rank, max_rank, similarity_threshold, state.cache_factor)
 
-    # Dual-threshold reference lane bounds (arXiv 2601.11687)
+    # Dual-threshold reference lane bounds 
     dual_mode = getattr(cfg, "dual_threshold_reference_mode", False)
     band_low = getattr(cfg, "llm_equivalence_ambiguity_band_low", 0.70)
     band_high = getattr(cfg, "llm_equivalence_ambiguity_band_high", 0.85)
@@ -267,6 +268,7 @@ async def _rank_cache_answers_async(
             answer_text = cache_data.answers[0].answer if cache_data.answers else None
             if not answer_text or not str(answer_text).strip():
                 byte_log.debug("skip empty cache entry (async, rank=%.3f)", rank)
+                state.context["_byte_cascade_invalidated"] = True
                 continue
             cache_answers.append(
                 CacheAnswerMatch(

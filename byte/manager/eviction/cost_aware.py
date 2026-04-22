@@ -1,4 +1,4 @@
-"""Cost-aware cache eviction (arXiv 2508.07675).
+"""Cost-aware cache eviction .
 
 Based on "Semantic Caching for Low-Cost LLM Serving: From Offline Learning to
 Online Adaptation" (Zhao et al., August 2025). The paper argues that semantic
@@ -31,7 +31,7 @@ from byte.utils.log import byte_log
 
 
 class CostAwareCacheEviction(EvictionBase):
-    """Evicts the lowest-value cached entry first (arXiv 2508.07675)."""
+    """Evicts the lowest-value cached entry first ."""
 
     def __init__(
         self,

@@ -1929,12 +1929,12 @@
         </div>
       </div>
       <div class="byte-cap" id="byteCap">
-        <div class="feat-ind quality-ind" id="fi-quality" title="Quality Guard — always active on Byte responses"><div class="fi-dot"></div>Quality Guard</div>
-        <div class="feat-ind" id="fi-cache" title="Semantic Cache Hit — response served from cache"><div class="fi-dot"></div>Cache Hit</div>
-        <div class="feat-ind" id="fi-routing" title="Smart Routing — request dispatched to optimal worker"><div class="fi-dot"></div>Smart Routing</div>
-        <div class="feat-ind" id="fi-distill" title="Prompt Distillation — context compressed for efficiency"><div class="fi-dot"></div>Distillation</div>
-        <div class="feat-ind" id="fi-reasoning" title="Reasoning Reuse — cached reasoning chain reused"><div class="fi-dot"></div>λ Reasoning Reuse</div>
-        <div class="feat-ind cascade-ind" id="fi-cascade" title="Cascade Fallback — stale cache auto-invalidated, fresh response fetched"><div class="fi-dot"></div>↻ Cascade Fallback</div>
+        <div class="feat-ind quality-ind" id="fi-quality" title="Byte Quality Guard — multi-signal confidence scoring on every response"><div class="fi-dot"></div>Quality Guard</div>
+        <div class="feat-ind" id="fi-cache" title="Byte Semantic Cache — tiered similarity matching with ambiguity-band reranking"><div class="fi-dot"></div>Cache Hit</div>
+        <div class="feat-ind" id="fi-routing" title="Byte Smart Router — multi-signal complexity analysis chose the cost-optimal model"><div class="fi-dot"></div>Smart Routing</div>
+        <div class="feat-ind" id="fi-distill" title="Byte Prompt Distillation — context compressed with faithfulness verification"><div class="fi-dot"></div>Distillation</div>
+        <div class="feat-ind" id="fi-reasoning" title="Byte Reasoning Reuse — deterministic shortcut or verified memory answered without calling the LLM"><div class="fi-dot"></div>λ Reasoning Reuse</div>
+        <div class="feat-ind cascade-ind" id="fi-cascade" title="Byte Cascade — stale entry auto-invalidated or low-confidence response escalated"><div class="fi-dot"></div>↻ Cascade Fallback</div>
       </div>
       <div class="msgs" id="byteMsgs">
         <div class="empty" id="byteEmpty">
@@ -3208,6 +3208,20 @@ function activateFeature(id) {
   const el = $(id); if (el) el.classList.add('active');
 }
 
+// Read the unified byte_features contract from the backend and light up only
+// the pills whose real signals fired. No client-side guessing.
+function applyByteFeatures(features) {
+  if (!features) return;
+  if (features.quality && features.quality.ran)                            activateFeature('fi-quality');
+  if (features.cache && features.cache.hit)                                activateFeature('fi-cache');
+  if (features.routing && (features.routing.swapped || features.routing.worker_dispatched))
+                                                                           activateFeature('fi-routing');
+  if (features.distillation && features.distillation.applied)              activateFeature('fi-distill');
+  if (features.reasoning && features.reasoning.reused)                     activateFeature('fi-reasoning');
+  if (features.cascade && (features.cascade.escalated || features.cascade.stale_invalidated))
+                                                                           activateFeature('fi-cascade');
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    File attachments
 ═══════════════════════════════════════════════════════════════════════════ */
@@ -3483,7 +3497,8 @@ async function _sendByteOnce(text, messages, skipCache) {
             updateStreamBubble(shellId, content);
             if (chunk.byte !== undefined) hit = chunk.byte;
             if (chunk.usage) uso = chunk.usage;  // accumulate — final chunk wins
-            fin = chunk;
+            if (chunk.byte_features) fin = Object.assign(fin || {}, chunk);
+            else fin = chunk;
           } catch(parseErr) {
             if (parseErr.message && !parseErr.message.startsWith('JSON')) throw parseErr;
           }
@@ -3513,11 +3528,7 @@ async function _sendByteOnce(text, messages, skipCache) {
       recordByte(lat, cost, uso, hit);
       S.byteHistory.push({ role:'assistant', content });
       S.lastTurn.byte = { lat, cost, hit };
-      // Feature indicators
-      activateFeature('fi-quality');
-      if (hit)      { activateFeature('fi-cache'); activateFeature('fi-reasoning'); }
-      if (st.worker)  activateFeature('fi-routing');
-      if (S.distill)  activateFeature('fi-distill');
+      applyByteFeatures(fin && fin.byte_features);
       return { success:true };
 
     } else {
@@ -3541,11 +3552,7 @@ async function _sendByteOnce(text, messages, skipCache) {
       recordByte(lat, cost, uso, hit);
       S.byteHistory.push({ role:'assistant', content });
       S.lastTurn.byte = { lat, cost, hit };
-      // Feature indicators
-      activateFeature('fi-quality');
-      if (hit)      { activateFeature('fi-cache'); activateFeature('fi-reasoning'); }
-      if (st.worker)  activateFeature('fi-routing');
-      if (S.distill)  activateFeature('fi-distill');
+      applyByteFeatures(data.byte_features);
       return { success:true };
     }
 

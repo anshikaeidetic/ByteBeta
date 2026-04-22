@@ -1,6 +1,6 @@
 """LLM-based equivalence detection for ambiguous cache similarity scores.
 
-Implements the LLM-based equivalence check from arXiv 2601.11687
+Implements the LLM-based equivalence check from 
 (Harmohit Singh, January 2026, "Semantic Caching and Intent-Driven Context
 Optimization for Multi-Agent Natural Language to Code Systems").
 
@@ -78,7 +78,7 @@ def _call_llm_equivalence(
 class LLMEquivalenceEvaluation(SimilarityEvaluation):
     """LLM-based equivalence check for ambiguous similarity scores.
 
-    Implements arXiv 2601.11687 (Harmohit Singh, Jan 2026). Wraps a base
+    Implements  . Wraps a base
     evaluator. When the base score falls in the ambiguity band, an LLM call
     determines true equivalence and populates adaptation_hints in src_dict.
 

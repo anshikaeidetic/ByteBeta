@@ -1,4 +1,4 @@
-"""LSH-based approximate cache prefilter (arXiv 2503.05530).
+"""LSH-based approximate cache prefilter .
 
 Based on "Leveraging Approximate Caching for Faster Retrieval-Augmented
 Generation" (March 2025). The idea: a locality-sensitive hash provides a

@@ -147,7 +147,7 @@ def _set_cache_stage_metadata(cache_obj: Cache, *, stage: str, pipeline: str) ->
 def _safe_semantic_config(config: Config | None) -> Config:
     cfg = _clone_config(config)
     # Threshold 0.85: balances hit rate (more cache reuse) vs. false-positives.
-    # Research on semantic caching (GPTCache, CacheBlend) shows 0.85-0.90 is the
+    # Empirically, 0.85-0.90 is the
     # sweet spot for general workloads — above 0.90 misses too many rephrased queries,
     # below 0.80 risks returning wrong answers for different questions.
     if cfg.similarity_threshold < 0.85:

@@ -63,14 +63,14 @@ class CacheConfig:
     native_prompt_cache_min_chars: int = 1200
     native_prompt_cache_ttl: str | None = None
     semantic_allowed_categories: list[str] | None = None
-    vcache_enabled: bool = False               # vCache per-prompt learned threshold (arXiv 2502.03771)
+    vcache_enabled: bool = False               # vCache per-prompt learned threshold 
     vcache_delta: float = 0.05                 # max tolerated error rate; default 5%
     vcache_min_observations: int = 10          # cold-start: use global threshold below this count
     vcache_cold_fallback_threshold: float = 0.80
-    dual_threshold_reference_mode: bool = False  # Stage 2 reference lane (arXiv 2601.11687)
-    # Cost-aware eviction (arXiv 2508.07675). Choices: "LRU" (default) | "COST_AWARE".
+    dual_threshold_reference_mode: bool = False  # Stage 2 reference lane 
+    # Cost-aware eviction . Choices: "LRU" (default) | "COST_AWARE".
     eviction_policy: str = "LRU"
-    # LSH prefilter (arXiv 2503.05530) — near-duplicate MinHash-LSH gate before vector search.
+    # LSH prefilter  — near-duplicate MinHash-LSH gate before vector search.
     lsh_prefilter_enabled: bool = False
     lsh_num_perm: int = 128
     lsh_threshold: float = 0.6
@@ -110,10 +110,13 @@ class RoutingConfig:
     routing_adaptive_quality_floor: float = 0.75
     speculative_routing: bool = False
     speculative_max_parallel: int = 2
-    # RouteLLM — learned cheap/strong router (arXiv 2406.18665)
-    route_llm_enabled: bool = False
+    # Byte Smart Router — multi-signal complexity analysis for model tier selection
+    route_llm_enabled: bool = True
     route_llm_threshold: float = 0.5
     route_llm_seed_path: str = ""   # optional path to labelled JSON seed examples
+    # Byte Cascade — confidence-gated escalation from cheap to strong tier
+    cascade_escalation_enabled: bool = True
+    cascade_confidence_threshold: float = 0.55
 
 
 @dataclass
@@ -133,7 +136,7 @@ class QualityConfig:
     output_contract_enforcement: bool = True
     ambiguity_detection: bool = True
     ambiguity_min_chars: int = 24
-    llm_equivalence_enabled: bool = False                        # LLM-based ambiguity resolution (arXiv 2601.11687)
+    llm_equivalence_enabled: bool = False                        # LLM-based ambiguity resolution 
     llm_equivalence_ambiguity_band_low: float = 0.70             # lower bound of ambiguity band
     llm_equivalence_ambiguity_band_high: float = 0.85            # upper bound of ambiguity band
     llm_equivalence_model: str = ""                              # defaults to routing_cheap_model at runtime
@@ -156,15 +159,15 @@ class ContextCompilerConfig:
     context_budget_medium_risk_chars: int = 4800
     context_budget_high_risk_chars: int = 7600
     negative_context_memory: bool = True
-    intent_context_filtering_enabled: bool = False  # intent-driven token pruning (arXiv 2601.11687)
+    intent_context_filtering_enabled: bool = False  # intent-driven token pruning 
     intent_context_budget_ratio: float = 0.6        # keep top 60% of context tokens by intent relevance
     intent_cache_intent_labels: bool = True         # store intent label in context alongside answer
 
 
 @dataclass
 class PromptDistillationConfig:
-    prompt_distillation: bool = False
-    prompt_distillation_mode: str = "shadow"
+    prompt_distillation: bool = True
+    prompt_distillation_mode: str = "active"
     prompt_distillation_backend: str = "hybrid_local"
     prompt_distillation_budget_ratio: float = 0.55
     prompt_distillation_min_chars: int = 512
@@ -247,13 +250,13 @@ class TrustConfig:
     confidence_mode: str = "calibrated"
     confidence_backend: str = "hybrid"
     conformal_target_coverage: float = 0.95
-    reuse_band_policy: str = "adaptive"  # Deprecated: use vcache_enabled / vcache_delta (vCache, arXiv 2502.03771)
+    reuse_band_policy: str = "adaptive"  # Deprecated: use vcache_enabled / vcache_delta (vCache, )
     conformal_mode: str = "guarded"
     deterministic_execution: bool = True
     deterministic_contract_mode: str = "enforced"
     semantic_cache_verifier_mode: str = "hybrid"
     semantic_cache_promotion_mode: str = "shadow"
-    novelty_threshold: float = 0.62  # Deprecated: use vcache_delta (vCache, arXiv 2502.03771)
+    novelty_threshold: float = 0.62  # Deprecated: use vcache_delta (vCache, )
     prompt_module_mode: str = "enabled"
     calibration_artifact_version: str = "byte-trust-v2"
     benchmark_contract_version: str = "byte-benchmark-v2"
