@@ -680,6 +680,20 @@
       transition: all .15s;
     }
     .paper-info-i:hover { border-color: var(--byte); color: var(--byte); background: var(--byte-light); }
+    .paper-info-popover {
+      position: absolute; z-index: 100; top: 100%; left: 50%; transform: translateX(-50%);
+      margin-top: 6px; padding: 10px 14px; border-radius: var(--r);
+      background: var(--surface); border: 1px solid var(--border-mid);
+      box-shadow: var(--sh-lg); font-size: 12px; color: var(--text-2);
+      line-height: 1.55; max-width: 280px; min-width: 180px;
+      font-weight: 400; font-family: var(--sans); white-space: normal;
+      animation: pop .15s ease;
+    }
+    .paper-info-popover::before {
+      content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+      border-left: 5px solid transparent; border-right: 5px solid transparent;
+      border-bottom: 5px solid var(--border-mid);
+    }
 
     /* ── Research panel ───────────────────────────────────────────────── */
     .papers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
@@ -2710,7 +2724,8 @@ function _detectProviderFromKey(key) {
   if (key.startsWith('ya29.'))   return 'vertex';
   if (key.startsWith('hf_'))     return 'huggingface';
   if (key.startsWith('AKIA'))    return 'bedrock';
-  if (key.startsWith('sk-'))     return 'openai';
+  // sk- is ambiguous (OpenAI, DeepSeek, Mistral all use it)
+  // Don't auto-switch — let the user's chosen provider stand
   return null;
 }
 
@@ -2950,7 +2965,7 @@ async function connect() {
     }
     S.serverCacheMode = serverMode;
     setStatus('on', `Connected · ${h.version || 'Byte'}`);
-    toast('Connected to Byte server', 'ok');
+    toast(`Connected to Byte server via ${$('provider').value.toUpperCase()}`, 'ok');
     updateCacheDisplay(serverMode);
   } catch(e) {
     setStatus('off', 'Byte offline');
@@ -3526,7 +3541,7 @@ async function _sendByteOnce(text, messages, skipCache) {
       }
       if (!content && streamCompleted) {
         const el = $(shellId); if (el) el.remove();
-        throw new Error(`Byte returned empty response for "${byteModel}".`);
+        throw new Error(`Byte returned empty response for "${byteModel}". Verify your API key matches the selected provider (${$('provider').value}).`);
       }
 
       const lat = performance.now() - t0;
@@ -3552,7 +3567,7 @@ async function _sendByteOnce(text, messages, skipCache) {
       content    = data.choices?.[0]?.message?.content || '';
       hit        = !!data.byte;
       if (!content) {
-        throw new Error(`No response from Byte for "${byteModel}". Ensure server has the ${$('provider').value} API key.`);
+        throw new Error(`No response from Byte for "${byteModel}". Verify your API key matches the selected provider (${$('provider').value}).`);
       }
       const uso  = data.usage || {};
       const actualModel = hit ? byteModel : (data.model || byteModel);
@@ -4594,6 +4609,21 @@ window.addEventListener('load', () => {
 
   pingServer().catch(() => {});
   syncModeFromServer().catch(() => {});
+
+  // Paper info (i) button click → popover (works on mobile + desktop)
+  document.addEventListener('click', function(e) {
+    document.querySelectorAll('.paper-info-popover').forEach(p => p.remove());
+    const btn = e.target.closest('.paper-info-i');
+    if (!btn) return;
+    e.stopPropagation();
+    const tooltip = btn.getAttribute('title');
+    if (!tooltip) return;
+    const pop = document.createElement('div');
+    pop.className = 'paper-info-popover';
+    pop.textContent = tooltip;
+    btn.appendChild(pop);
+    setTimeout(() => { if (pop.parentNode) pop.remove(); }, 8000);
+  });
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════

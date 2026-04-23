@@ -33,8 +33,9 @@ def _prewarm_embedding(cache_obj: Cache) -> None:
         to_embeddings = getattr(embedding, "to_embeddings", None)
         if callable(to_embeddings):
             to_embeddings("warmup")
-    except Exception:
-        pass
+    except Exception as exc:
+        from byte.utils.log import byte_log
+        byte_log.warning("Embedding prewarm failed (non-fatal): %s", exc)
 
 
 def _init_gateway_cache(
