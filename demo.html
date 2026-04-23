@@ -1197,7 +1197,7 @@
     <button class="mbtab"        id="mbtab-generate"     onclick="setAppMode('generate')">Generate</button>
     <button class="mbtab"        id="mbtab-intelligence" onclick="setAppMode('intelligence')">Intelligence</button>
     <button class="mbtab"        id="mbtab-dashboard"    onclick="setAppMode('dashboard')">Dashboard</button>
-    <button class="mbtab"        id="mbtab-research"     onclick="setAppMode('research')">Optimizations</button>
+    <button class="mbtab"        id="mbtab-research"     onclick="setAppMode('research')">Byte Engine</button>
     <button class="mbtab"        id="mbtab-admin"        onclick="setAppMode('admin')">Admin</button>
   </div>
 
@@ -1391,7 +1391,7 @@
       <li><span class="ai-dot"></span><span style="color:var(--text-3); font-style:italic">Select a goal above to activate algorithms.</span></li>
     </ul>
 
-    <a class="ai-link" href="#" onclick="setAppMode('research'); return false;">View Optimizations panel for expert controls</a>
+    <a class="ai-link" href="#" onclick="setAppMode('research'); return false;">View Byte Engine for expert controls</a>
   </div>
 
   <!-- ── Dashboard Panel ───────────────────────────────────────────────── -->
@@ -1455,12 +1455,12 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2311.04934" target="_blank">arXiv ↗</a>
           <span class="paper-status active" id="ps-prompt-module">Active</span>
         </div>
-        <div class="paper-title">Prompt Reuse <button type="button" class="paper-info-i" title="Caches repeated system prompts so they don't need to be re-processed each time, reducing first-token latency by reusing attention states across requests.">i</button></div>
-        <div class="paper-desc">Automatically detects and reuses repeated prompt patterns, so identical system instructions are processed only once — cutting response time.</div>
+        <div class="paper-title">Prompt Recycler <button type="button" class="paper-info-i" title="Detects repeated instructions and reuses cached attention states. Cuts first-token wait time by skipping redundant processing of identical system prompts.">i</button></div>
+        <div class="paper-desc">Detects repeated instructions and reuses cached attention states. Cuts first-token wait time.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-prompt-module" onchange="patchConfig('prompt_module_mode', this.checked ? 'enabled' : 'disabled')">
-            <span>prompt_module_mode</span>
+            <span>Enable Prompt Recycling</span>
           </label>
         </div>
         <div class="paper-metric"><span>Registered modules:</span><span class="metric-val" id="mv-prompt-module">—</span></div>
@@ -1473,8 +1473,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2310.06839" target="_blank">arXiv ↗</a>
           <span class="paper-status active" id="ps-distillation">Active</span>
         </div>
-        <div class="paper-title">Smart Compression <button type="button" class="paper-info-i" title="LongLLMLingua: Uses a small model to intelligently compress long prompts by scoring which parts matter most for your query, reducing tokens by 50–80%.">i</button></div>
-        <div class="paper-desc">Intelligently shrinks long prompts by keeping only the most relevant parts, saving 50–80% of token costs without losing answer quality.</div>
+        <div class="paper-title">Prompt Slimmer <button type="button" class="paper-info-i" title="Analyzes your prompt and removes redundant content while keeping meaning. Saves 50–80% on tokens using query-aware importance scoring.">i</button></div>
+        <div class="paper-desc">Analyzes your prompt and removes redundant content while keeping meaning. Saves 50–80% on tokens.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <select class="paper-codec-select" onchange="patchConfig('prompt_distillation_mode', this.value)">
@@ -1483,7 +1483,7 @@
               <option value="enabled">Enabled</option>
               <option value="disabled">Disabled</option>
             </select>
-            <span>prompt_distillation_mode</span>
+            <span>Compression Level</span>
           </label>
         </div>
         <div class="paper-metric"><span>Faithfulness:</span><span class="metric-val" id="mv-distillation">—</span></div>
@@ -1496,8 +1496,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2403.12968" target="_blank">arXiv ↗</a>
           <span class="paper-status active">Active</span>
         </div>
-        <div class="paper-title">Universal Compression Engine <button type="button" class="paper-info-i" title="LLMLingua-2: A task-agnostic compression backend that works across any use case without special tuning, using learned distillation to remove redundant tokens.">i</button></div>
-        <div class="paper-desc">A general-purpose compression engine that works across all types of prompts — no task-specific setup needed.</div>
+        <div class="paper-title">Auto Compressor <button type="button" class="paper-info-i" title="A general-purpose backend that compresses any prompt type without manual tuning. Choose between hybrid, local model, or heuristic compression engines.">i</button></div>
+        <div class="paper-desc">A general-purpose backend that compresses any prompt type without manual tuning.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <select class="paper-codec-select" onchange="patchConfig('prompt_distillation_backend', this.value)">
@@ -1505,7 +1505,7 @@
               <option value="local_model">Local Model (LLMLingua-2)</option>
               <option value="heuristic">Heuristic only</option>
             </select>
-            <span>prompt_distillation_backend</span>
+            <span>Compression Engine</span>
           </label>
         </div>
         <div class="paper-metric"><span>Backend:</span><span class="metric-val" id="mv-distill-backend">hybrid_local</span></div>
@@ -1518,12 +1518,12 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2310.06201" target="_blank">arXiv ↗</a>
           <span class="paper-status active" id="ps-ctx-compiler">Active</span>
         </div>
-        <div class="paper-title">Context Optimizer <button type="button" class="paper-info-i" title="Context Pruning (2310.06201): Selectively removes less-relevant sentences from the context window, cutting prompt tokens without quality loss.">i</button></div>
-        <div class="paper-desc">Automatically trims irrelevant context from your prompts, reducing token usage while preserving answer accuracy.</div>
+        <div class="paper-title">Context Trimmer <button type="button" class="paper-info-i" title="Removes irrelevant context sentences from your prompt. Fewer tokens, same accuracy. Works with the Document Filter for RAG workflows.">i</button></div>
+        <div class="paper-desc">Removes irrelevant context sentences from your prompt. Fewer tokens, same accuracy.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-ctx-compiler" onchange="patchConfig('context_compiler', this.checked)">
-            <span>context_compiler</span>
+            <span>Enable Trimming</span>
           </label>
         </div>
         <div class="paper-metric"><span>Tokens saved (session):</span><span class="metric-val" id="mv-ctx-compiler">—</span></div>
@@ -1536,10 +1536,10 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2310.04408" target="_blank">arXiv ↗</a>
           <span class="paper-status active">Active</span>
         </div>
-        <div class="paper-title">RAG Filter <button type="button" class="paper-info-i" title="RECOMP (2310.04408): Filters retrieved documents before they're added to context, keeping only the most relevant passages to improve precision and reduce cost.">i</button></div>
-        <div class="paper-desc">Filters retrieved documents before adding them to context, keeping only the most relevant passages for better precision and lower costs.</div>
+        <div class="paper-title">Document Filter <button type="button" class="paper-info-i" title="Filters retrieved documents before adding to context. Keeps only relevant passages for better precision and lower cost. Activates when Context Trimmer is enabled.">i</button></div>
+        <div class="paper-desc">Filters retrieved documents before adding to context. Keeps only relevant passages.</div>
         <div class="paper-controls">
-          <div class="paper-info-box">Integrated into context_compiler pipeline. Enable context_compiler to activate RECOMP selective augmentation.</div>
+          <div class="paper-info-box">Integrated into the Context Trimmer pipeline. Enable Context Trimmer to activate Document Filter.</div>
         </div>
         <div class="paper-metric"><span>Augmentation hit rate:</span><span class="metric-val" id="mv-recomp">—</span></div>
       </div>
@@ -1551,12 +1551,12 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2502.03771" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-vcache">Standby</span>
         </div>
-        <div class="paper-title">Verified Cache <button type="button" class="paper-info-i" title="vCache (2502.03771, UC Berkeley Sky Lab): Uses a learned per-prompt threshold with formal error-rate guarantee δ to ensure cached responses are only served when quality is assured.">i</button></div>
-        <div class="paper-desc">Smart caching that mathematically guarantees response quality — only serves cached results when confidence exceeds your threshold.</div>
+        <div class="paper-title">Confidence Cache <button type="button" class="paper-info-i" title="Only serves cached responses when mathematically confident they're correct. Adjust the error threshold (δ) to control quality vs. hit rate tradeoff.">i</button></div>
+        <div class="paper-desc">Only serves cached responses when mathematically confident they're correct. Adjustable error threshold.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-vcache" onchange="patchConfig('vcache_enabled', this.checked); document.getElementById('ps-vcache').textContent = this.checked ? 'Active' : 'Standby'; document.getElementById('ps-vcache').className = 'paper-status ' + (this.checked ? 'active' : 'standby')">
-            <span>vcache_enabled</span>
+            <span>Enable Confidence Cache</span>
           </label>
         </div>
         <div class="paper-controls">
@@ -1579,8 +1579,8 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2407.02211" target="_blank">arXiv ↗</a>
           <span class="paper-status active">Active</span>
         </div>
-        <div class="paper-title">Prompt Internalization <button type="button" class="paper-info-i" title="PromptIntern (2407.02211): Absorbs frequently-used prompt fragments into model weights via fine-tuning, eliminating re-tokenization overhead at inference time.">i</button></div>
-        <div class="paper-desc">Learns your most-used prompt patterns and bakes them into the model, eliminating repetitive processing overhead.</div>
+        <div class="paper-title">Pattern Learner <button type="button" class="paper-info-i" title="Learns your most-used prompt patterns so they don't need re-processing. Absorbs frequent prompts into model weights. Local HuggingFace models only.">i</button></div>
+        <div class="paper-desc">Learns your most-used prompt patterns so they don't need re-processing. Local models only.</div>
         <div class="paper-controls">
           <div class="paper-info-box">Active for local HuggingFace models only. Set prompt_distillation_module_mode to <code>enabled</code> with a local_model backend.</div>
         </div>
@@ -1594,19 +1594,19 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2406.03482" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-qjl">Standby</span>
         </div>
-        <div class="paper-title">Memory Compression <button type="button" class="paper-info-i" title="QJL (2406.03482): Uses 1-bit Johnson-Lindenstrauss transforms to compress KV cache tensors, achieving 4–8× memory reduction with zero-overhead attention computation.">i</button></div>
-        <div class="paper-desc">Compresses model memory usage by 4–8× using advanced quantization, enabling more concurrent requests with less hardware.</div>
+        <div class="paper-title">Memory Saver <button type="button" class="paper-info-i" title="Compresses model memory 4–8× using quantization. Enables more concurrent users on same hardware. Choose from multiple compression methods.">i</button></div>
+        <div class="paper-desc">Compresses model memory 4–8× using quantization. Enables more concurrent users on same hardware.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <select class="paper-codec-select" id="kv-codec-select" onchange="handleKvCodecChange(this.value)">
               <option value="disabled">Disabled</option>
-              <option value="qjl">QJL (arXiv 2406.03482)</option>
-              <option value="polarquant">PolarQuant (arXiv 2502.02617)</option>
-              <option value="turboquant">TurboQuant (arXiv 2504.19874)</option>
-              <option value="h2o">H2O Eviction</option>
+              <option value="qjl">QJL — 1-bit compression</option>
+              <option value="polarquant">PolarQuant — precision compression</option>
+              <option value="turboquant">TurboQuant — realtime compression</option>
+              <option value="h2o">Smart Eviction</option>
               <option value="hybrid">Hybrid</option>
             </select>
-            <span>kv_codec</span>
+            <span>Compression Method</span>
           </label>
         </div>
         <div class="paper-metric"><span>Active codec:</span><span class="metric-val" id="mv-kv-codec">disabled</span></div>
@@ -1619,10 +1619,10 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2502.02617" target="_blank">arXiv ↗</a>
           <span class="paper-status standby">Standby</span>
         </div>
-        <div class="paper-title">Precision Quantization <button type="button" class="paper-info-i" title="PolarQuant (2502.02617): Exploits rotational symmetry in key cache activations to quantize with minimal error, preserving attention accuracy.">i</button></div>
-        <div class="paper-desc">High-fidelity memory compression that preserves attention accuracy while reducing hardware requirements.</div>
+        <div class="paper-title">Precision Compressor <button type="button" class="paper-info-i" title="High-fidelity memory compression that preserves attention accuracy. Select 'PolarQuant' in the Memory Saver dropdown above to enable.">i</button></div>
+        <div class="paper-desc">High-fidelity memory compression that preserves attention accuracy. Select in Memory Saver dropdown.</div>
         <div class="paper-controls">
-          <div class="paper-info-box">Select <strong>PolarQuant</strong> in the kv_codec selector above (Paper 8) to enable.</div>
+          <div class="paper-info-box">Select <strong>PolarQuant — precision compression</strong> in the Memory Saver dropdown above to enable.</div>
         </div>
         <div class="paper-metric"><span>kv_bits:</span><span class="metric-val" id="mv-polarquant">8</span></div>
       </div>
@@ -1634,10 +1634,10 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2504.19874" target="_blank">arXiv ↗</a>
           <span class="paper-status standby">Standby</span>
         </div>
-        <div class="paper-title">Turbo Compression <button type="button" class="paper-info-i" title="TurboQuant (2504.19874): Real-time quantization of KV activations during serving with Triton/CUDA kernels, achieving near-lossless compression at 4 bits.">i</button></div>
-        <div class="paper-desc">Real-time compression during inference for near-lossless quality at a fraction of the memory cost.</div>
+        <div class="paper-title">Realtime Compressor <button type="button" class="paper-info-i" title="Compresses during inference with near-zero quality loss. Select 'TurboQuant' in the Memory Saver dropdown above to enable.">i</button></div>
+        <div class="paper-desc">Compresses during inference with near-zero quality loss. Select in Memory Saver dropdown.</div>
         <div class="paper-controls">
-          <div class="paper-info-box">Select <strong>TurboQuant</strong> in the kv_codec selector above (Paper 8) to enable.</div>
+          <div class="paper-info-box">Select <strong>TurboQuant — realtime compression</strong> in the Memory Saver dropdown above to enable.</div>
         </div>
         <div class="paper-metric"><span>kv_bits:</span><span class="metric-val" id="mv-turboquant">8</span></div>
       </div>
@@ -1649,10 +1649,10 @@
           <a class="paper-arxiv" href="https://mlsys.org/" target="_blank">mlsys.org ↗</a>
           <span class="paper-status taxonomy">Taxonomy</span>
         </div>
-        <div class="paper-title">Compression Taxonomy <button type="button" class="paper-info-i" title="MLSys 2025 Survey: A unified taxonomy of KV cache compression techniques (eviction, quantization, projection, sparsity) that informs Byte's compression strategy.">i</button></div>
-        <div class="paper-desc">Reference framework that guides Byte's compression strategy across all quantization and eviction methods.</div>
+        <div class="paper-title">Compression Guide <button type="button" class="paper-info-i" title="Reference framework informing Byte's compression strategy. No toggle — this guides the design of Memory Saver, Precision Compressor, Realtime Compressor, and Smart Eviction.">i</button></div>
+        <div class="paper-desc">Reference framework informing Byte's compression strategy. No toggle — guides overall design.</div>
         <div class="paper-controls">
-          <div class="paper-info-box">Reference taxonomy only — no direct config toggle. Informs the design of QJL, PolarQuant, TurboQuant, and H2O implementations.</div>
+          <div class="paper-info-box">Reference taxonomy only — no direct toggle. Informs the design of Memory Saver, Precision Compressor, Realtime Compressor, and Cache Housekeeper.</div>
         </div>
       </div>
 
@@ -1663,12 +1663,12 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2306.14048" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-h2o">Standby</span>
         </div>
-        <div class="paper-title">Smart Eviction <button type="button" class="paper-info-i" title="H2O (Heavy-Hitter Oracle): Intelligently evicts cached entries by identifying the most important tokens, keeping only high-value and recent entries.">i</button></div>
-        <div class="paper-desc">Intelligently manages cache memory by keeping the most important entries and evicting low-value ones automatically.</div>
+        <div class="paper-title">Cache Housekeeper <button type="button" class="paper-info-i" title="Automatically removes low-value cache entries while keeping important ones. Adjustable heavy-hitter and recency ratios.">i</button></div>
+        <div class="paper-desc">Automatically removes low-value cache entries while keeping important ones. Adjustable ratios.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-h2o" onchange="patchConfig('h2o_enabled', this.checked); document.getElementById('ps-h2o').textContent = this.checked ? 'Active' : 'Standby'; document.getElementById('ps-h2o').className = 'paper-status ' + (this.checked ? 'active' : 'standby')">
-            <span>h2o_enabled</span>
+            <span>Enable Housekeeping</span>
           </label>
         </div>
         <div class="paper-controls">
@@ -1691,24 +1691,24 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2601.11687" target="_blank">arXiv ↗</a>
           <span class="paper-status standby" id="ps-nl2code">Standby</span>
         </div>
-        <div class="paper-title">Intent-Aware Caching <button type="button" class="paper-info-i" title="NL2Code (2601.11687): Three-part system — LLM-based equivalence detection, dual-threshold reference mode, and intent-driven context filtering for 40–60% token reduction.">i</button></div>
-        <div class="paper-desc">Understands the intent behind each query to decide caching, filtering, and context selection — saving 40–60% of tokens.</div>
+        <div class="paper-title">Intent Detector <button type="button" class="paper-info-i" title="Understands query intent to decide caching and context filtering. Three controls: AI match detection, smart reference mode, and intent-based filtering. Saves 40–60% tokens.">i</button></div>
+        <div class="paper-desc">Understands query intent to decide caching and context filtering. Saves 40–60% tokens.</div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-llm-equiv" onchange="patchConfig('llm_equivalence_enabled', this.checked)">
-            <span>llm_equivalence_enabled</span>
+            <span>AI-Powered Match Detection</span>
           </label>
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-dual-thresh" onchange="patchConfig('dual_threshold_reference_mode', this.checked); document.getElementById('ps-nl2code').textContent = this.checked ? 'Active' : 'Standby'; document.getElementById('ps-nl2code').className = 'paper-status ' + (this.checked ? 'active' : 'standby')">
-            <span>dual_threshold_reference_mode</span>
+            <span>Smart Reference Mode</span>
           </label>
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input type="checkbox" class="paper-toggle" id="pt-intent-filter" onchange="patchConfig('intent_context_filtering_enabled', this.checked)">
-            <span>intent_context_filtering_enabled</span>
+            <span>Intent-Based Filtering</span>
           </label>
           <label class="paper-slider-wrap" style="margin-left:6px">
             Budget <input type="range" min="0.3" max="1.0" step="0.05" value="0.6" style="width:70px" oninput="this.nextElementSibling.textContent=this.value; patchConfig('intent_context_budget_ratio', parseFloat(this.value))">
@@ -1729,15 +1729,15 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2406.18665" target="_blank">arXiv &#x2197;</a>
           <span class="paper-status standby" id="ps-route-llm">Standby</span>
         </div>
-        <div class="paper-title">Smart Router <button type="button" class="paper-info-i" title="RouteLLM (2406.18665): A classifier scores each query and routes simple ones to a cheaper model while escalating complex ones to a stronger model — 2–3× cost reduction at equal quality.">i</button></div>
+        <div class="paper-title">Cost Router <button type="button" class="paper-info-i" title="Routes simple queries to cheaper models, complex ones to stronger models. 2–3× cost savings with no quality loss. Adjust threshold to control routing sensitivity.">i</button></div>
         <div class="paper-desc">
-          Automatically routes simple queries to cheaper models and complex ones to stronger models — saving 2–3× on costs with no quality loss.
+          Routes simple queries to cheaper models, complex ones to stronger models. 2–3× cost savings.
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input class="paper-toggle" type="checkbox" id="pt-route-llm"
                    onchange="patchConfig('route_llm_enabled', this.checked); $('ps-route-llm').textContent = this.checked ? 'Active' : 'Standby'; $('ps-route-llm').className = 'paper-status ' + (this.checked ? 'active' : 'standby');">
-            route_llm_enabled
+            Enable Cost Router
           </label>
           <label class="paper-slider-wrap" style="margin-left:6px">
             Threshold <input type="range" min="0.1" max="0.9" step="0.05" value="0.5" style="width:80px"
@@ -1761,19 +1761,19 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2508.07675" target="_blank">arXiv &#x2197;</a>
           <span class="paper-status standby" id="ps-cost-evict">Standby</span>
         </div>
-        <div class="paper-title">Cost-Aware Cache Management <button type="button" class="paper-info-i" title="Cost-Aware Eviction (2508.07675): Replaces basic LRU with a quality×recency weighted policy — keeps high-value entries longer and removes low-quality ones first.">i</button></div>
+        <div class="paper-title">Value-Based Eviction <button type="button" class="paper-info-i" title="Keeps high-quality cached responses longer, removes low-value ones first. Smarter than time-based eviction. Choose from LRU, Cost-Aware, LFU, or FIFO strategies.">i</button></div>
         <div class="paper-desc">
-          Keeps your most valuable cached responses longer and removes low-quality ones first — smarter than basic time-based eviction.
+          Keeps high-quality cached responses longer, removes low-value ones first. Smarter than time-based.
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <select class="paper-codec-select" id="pc-eviction-policy" onchange="patchConfig('eviction_policy', this.value); $('ps-cost-evict').textContent = (this.value === 'COST_AWARE') ? 'Active' : 'Standby'; $('ps-cost-evict').className = 'paper-status ' + (this.value === 'COST_AWARE' ? 'active' : 'standby');">
               <option value="LRU">LRU (default)</option>
-              <option value="COST_AWARE">COST_AWARE</option>
-              <option value="LFU">LFU</option>
-              <option value="FIFO">FIFO</option>
+              <option value="COST_AWARE">Cost-Aware</option>
+              <option value="LFU">Least Frequently Used</option>
+              <option value="FIFO">First In First Out</option>
             </select>
-            eviction_policy
+            Eviction Strategy
           </label>
         </div>
         <div class="paper-metric">
@@ -1790,15 +1790,15 @@
           <a class="paper-arxiv" href="https://arxiv.org/abs/2503.05530" target="_blank">arXiv &#x2197;</a>
           <span class="paper-status standby" id="ps-lsh">Standby</span>
         </div>
-        <div class="paper-title">Fast Cache Lookup <button type="button" class="paper-info-i" title="Proximity LSH (2503.05530): A MinHash-LSH prefilter that catches near-duplicate queries in near-O(1) time, skipping expensive embedding + vector search. Up to 77% fewer similarity lookups.">i</button></div>
+        <div class="paper-title">Duplicate Spotter <button type="button" class="paper-info-i" title="Near-instant detection of repeated queries. Skips expensive similarity search for known duplicates. Up to 77% fewer lookups on repetitive workloads.">i</button></div>
         <div class="paper-desc">
-          Lightning-fast duplicate detection that catches repeated queries instantly, skipping expensive similarity searches — up to 77% faster lookups.
+          Near-instant detection of repeated queries. Skips expensive similarity search. Up to 77% faster lookups.
         </div>
         <div class="paper-controls">
           <label class="paper-toggle-wrap">
             <input class="paper-toggle" type="checkbox" id="pt-lsh"
                    onchange="patchConfig('lsh_prefilter_enabled', this.checked); $('ps-lsh').textContent = this.checked ? 'Active' : 'Standby'; $('ps-lsh').className = 'paper-status ' + (this.checked ? 'active' : 'standby');">
-            lsh_prefilter_enabled
+            Enable Duplicate Spotter
           </label>
           <label class="paper-slider-wrap" style="margin-left:6px">
             Threshold <input type="range" min="0.3" max="0.9" step="0.05" value="0.6" style="width:80px"
@@ -4637,41 +4637,41 @@ const _AUTO_ALGO_MAP = {
   balanced: {
     label: 'Balanced',
     active: [
-      'vCache — per-prompt learned threshold (2502.03771)',
-      'Dual-threshold reference lane (2601.11687)',
-      'Context compiler (2310.06201 + 2310.04408)',
-      'Prompt compression — guarded mode (2310.06839 / 2403.12968)',
-      'Intent context filter (2601.11687)',
+      'Confidence Cache — per-prompt learned threshold',
+      'Smart Reference Mode — dual-threshold matching',
+      'Context Trimmer + Document Filter',
+      'Prompt Slimmer — guarded mode',
+      'Intent-Based Filtering',
       'Adaptive threshold → 65% hit target',
-      'Prompt Cache bridge (2311.04934)',
+      'Prompt Recycler',
     ],
-    inactive: ['H2O eviction — local models only', 'KV quantization — local models only'],
+    inactive: ['Cache Housekeeper — local models only', 'Memory Saver — local models only'],
   },
   savings: {
     label: 'Max Savings',
     active: [
-      'vCache — high hit rate, δ=0.08 (2502.03771)',
-      'Dual-threshold reference lane (2601.11687)',
-      'Context compiler (2310.06201 + 2310.04408)',
-      'Aggressive prompt compression — enabled mode (2310.06839)',
-      'Intent context filter — 50% token budget (2601.11687)',
+      'Confidence Cache — high hit rate, δ=0.08',
+      'Smart Reference Mode — dual-threshold matching',
+      'Context Trimmer + Document Filter',
+      'Prompt Slimmer — aggressive enabled mode',
+      'Intent-Based Filtering — 50% token budget',
       'Adaptive threshold → 75% hit target',
-      'Prompt Cache bridge (2311.04934)',
+      'Prompt Recycler',
     ],
-    inactive: ['H2O eviction — local models only', 'KV quantization — local models only'],
+    inactive: ['Cache Housekeeper — local models only', 'Memory Saver — local models only'],
   },
   accuracy: {
     label: 'Max Accuracy',
     active: [
-      'vCache — strict threshold, δ=0.02 (2502.03771)',
-      'LLM equivalence check on ambiguous hits (2601.11687)',
-      'Context compiler (2310.06201 + 2310.04408)',
-      'Prompt compression — guarded mode (2310.06839)',
-      'Intent context filter (2601.11687)',
+      'Confidence Cache — strict threshold, δ=0.02',
+      'AI-Powered Match Detection — equivalence check',
+      'Context Trimmer + Document Filter',
+      'Prompt Slimmer — guarded mode',
+      'Intent-Based Filtering',
       'Adaptive threshold → 50% hit target',
-      'Prompt Cache bridge (2311.04934)',
+      'Prompt Recycler',
     ],
-    inactive: ['H2O eviction — local models only', 'KV quantization — local models only'],
+    inactive: ['Cache Housekeeper — local models only', 'Memory Saver — local models only'],
   },
 };
 

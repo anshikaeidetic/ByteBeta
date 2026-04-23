@@ -1,5 +1,5 @@
 import http.server, os
-os.chdir(r'C:\Users\bytevion\Downloads\Byte')
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 class H(http.server.SimpleHTTPRequestHandler):
     def log_message(self, fmt, *a): pass
