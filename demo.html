@@ -3665,6 +3665,7 @@ async function sendDirect(text, messages) {
       const reader   = resp.body.getReader();
       const dec      = new TextDecoder();
       let   buf      = '';
+      let   uso      = {};
 
       while (true) {
         const { done, value } = await reader.read();
@@ -3683,13 +3684,13 @@ async function sendDirect(text, messages) {
             const antDelta = chunk.type === 'content_block_delta' ? chunk.delta?.text : null;
             content += oaiDelta || antDelta || '';
             updateStreamBubble(shellId, content);
+            if (chunk.usage) uso = chunk.usage;
             fin = chunk;
           } catch { }
         }
       }
 
       const lat  = performance.now() - t0;
-      const uso  = fin?.usage || {};
       const pin  = uso.prompt_tokens ?? uso.input_tokens ?? Math.round(JSON.stringify(messages).length / 4);
       const pout = uso.completion_tokens ?? uso.output_tokens ?? Math.round(content.length / 4);
       const cost = calcCost(model, pin, pout);
