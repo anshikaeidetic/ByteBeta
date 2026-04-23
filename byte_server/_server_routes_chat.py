@@ -54,6 +54,34 @@ _PROVIDER_PREFIXES: dict[str, tuple[str, ...]] = {
     "mistral":   ("mistral-", "codestral-"),
     "cohere":    ("command-", "c4ai-"),
 }
+def _dict_to_stream_chunks(resp: dict) -> list:
+    """Convert a non-streaming cache-hit dict into SSE-compatible stream chunks."""
+    content = ""
+    choices = resp.get("choices") or []
+    if choices:
+        msg = (choices[0] or {}).get("message") or {}
+        content = msg.get("content", "")
+    created = resp.get("created", int(time.time()))
+    model = resp.get("model", "")
+    is_cache = resp.get("byte", False)
+    base: dict = {"created": created, "object": "chat.completion.chunk"}
+    if model:
+        base["model"] = model
+    if is_cache:
+        base["byte"] = True
+    for key in ("byte_provider", "byte_similarity"):
+        if key in resp:
+            base[key] = resp[key]
+    content_chunk = dict(base)
+    content_chunk["choices"] = [{"delta": {"content": content}, "finish_reason": None, "index": 0}]
+    final_chunk = dict(base)
+    final_chunk["choices"] = [{"delta": {}, "finish_reason": "stop", "index": 0}]
+    for key in ("byte_quality", "byte_reasoning", "byte_worker", "saved_token", "usage"):
+        if key in resp:
+            final_chunk[key] = resp[key]
+    return [content_chunk, final_chunk, "[DONE]"]
+
+
 def _build_byte_features(
     chat_response: Any,
     request: Request,
@@ -278,12 +306,15 @@ def register_chat_routes(app: FastAPI, services: ServerServices) -> None:
                             _is_cache_hit = False
                             _last_dict_chunk: dict[str, Any] | None = None
                             _distill_req = bool(chat_params.get("byte_prompt_distillation_mode"))
-                            for stream_response in handler(
+                            _raw_result = handler(
                                 cache_obj=runtime.gateway_cache,
                                 cache_skip=cache_skip,
                                 **auth_kwargs,
                                 **chat_params,
-                            ):
+                            )
+                            if isinstance(_raw_result, dict):
+                                _raw_result = _dict_to_stream_chunks(_raw_result)
+                            for stream_response in _raw_result:
                                 if stream_response == "[DONE]":
                                     _features_payload = json.dumps({
                                         "byte_features": _build_byte_features(
